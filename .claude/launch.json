@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "deepflowai",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "port": 3002
+    },
+    {
+      "name": "command-centre",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "--prefix", "C:\\Users\\Colin\\OneDrive\\Desktop\\DeepflowAI_project\\command-centre\\client", "dev"],
+      "port": 3001
+    }
+  ]
+}
