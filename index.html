@@ -98,12 +98,8 @@ body { -webkit-font-smoothing: antialiased; background: radial-gradient(circle a
 
 div.min-h-screen, .bg-slate-950 { background: transparent !important; }
 
-/* scope opacity-0 override to only section/article/div content — not nav overlays */
-section .opacity-0, article .opacity-0, main .opacity-0, .animate-fade-in-up.opacity-0 { opacity: 1 !important; }
-
-[class*="translate-y-6"], [class*="-translate-y-6"] { --tw-translate-y: 0px !important; transform: translateX(var(--tw-translate-x)) translateY(0px) !important; }
-
-[class*="-translate-x-8"] { --tw-translate-x: 0px !important; transform: translateX(0px) translateY(var(--tw-translate-y)) !important; }
+/* Make animated content immediately visible — scoped to avoid affecting nav/modal overlays */
+section .opacity-0, article .opacity-0, main .opacity-0 { opacity: 1 !important; transform: none !important; }
 
 nav.fixed { border-bottom: 1px solid rgba(148, 163, 184, 0.18) !important; }
 

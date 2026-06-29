@@ -26,7 +26,7 @@ const controlItems = [
 
 export const Dashboard: React.FC = () => {
   return (
-    <Section id="control" className="bg-slate-900">
+    <Section id="control" className="bg-slate-900 overflow-hidden">
       <Container>
         <div className="grid lg:grid-cols-2 gap-16 items-center">
 
@@ -123,7 +123,7 @@ export const Dashboard: React.FC = () => {
             </div>
 
             {/* Cyan glow behind card */}
-            <div className="absolute -inset-8 bg-gradient-to-br from-accent-500/10 via-blue-500/5 to-transparent rounded-3xl blur-3xl -z-10" />
+            <div className="absolute inset-0 bg-gradient-to-br from-accent-500/10 via-blue-500/5 to-transparent rounded-3xl blur-3xl -z-10" />
           </FadeIn>
         </div>
       </Container>

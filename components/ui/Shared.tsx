@@ -20,7 +20,7 @@ interface SectionProps {
 }
 
 export const Section: React.FC<SectionProps> = ({ children, className = '', id }) => (
-  <section id={id} className={`py-24 md:py-32 relative scroll-mt-24 ${className}`}>
+  <section id={id} className={`py-24 md:py-32 relative scroll-mt-24 ${className}`} style={{ overflowX: 'clip' }}>
     {children}
   </section>
 );

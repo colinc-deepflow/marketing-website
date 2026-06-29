@@ -203,18 +203,18 @@ function PackageJourney() {
             <React.Fragment key={s.id}>
               <button
                 onClick={() => setActive(s.id)}
-                className="flex flex-col items-center gap-3 group flex-shrink-0"
+                className="flex flex-col items-center gap-2 group flex-shrink-0 min-w-0"
               >
-                <div className={`w-10 h-10 rounded-full border-2 flex items-center justify-center font-black text-xs transition-all duration-300 ${
+                <div className={`w-9 h-9 rounded-full border-2 flex items-center justify-center font-black text-xs transition-all duration-300 ${
                   isActive
                     ? 'bg-accent-500 border-accent-500 text-slate-900 shadow-[0_0_20px_rgba(6,182,212,0.5)]'
                     : isPast
                     ? 'bg-accent-500/20 border-accent-500/50 text-accent-400'
                     : 'bg-slate-900 border-white/15 text-slate-500 group-hover:border-white/30 group-hover:text-slate-300'
                 }`}>
-                  {isPast ? <Check className="w-4 h-4" /> : s.step}
+                  {isPast ? <Check className="w-3.5 h-3.5" /> : s.step}
                 </div>
-                <span className={`text-xs font-bold uppercase tracking-widest whitespace-nowrap transition-colors ${
+                <span className={`text-[10px] font-bold uppercase tracking-wider text-center transition-colors ${
                   isActive ? 'text-white' : isPast ? 'text-accent-400/60' : 'text-slate-500 group-hover:text-slate-300'
                 }`}>
                   {s.label}

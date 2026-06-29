@@ -36,7 +36,7 @@ export const Hero: React.FC = () => {
 
           {/* Headline */}
           <FadeIn delay={80}>
-            <h1 className="text-6xl md:text-7xl lg:text-[88px] font-extrabold text-white tracking-tight leading-[1.04] mb-4">
+            <h1 className="text-[2.6rem] sm:text-6xl md:text-7xl lg:text-[88px] font-extrabold text-white tracking-tight leading-[1.04] mb-4">
               Built for the Trade.<br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-400 via-cyan-300 to-blue-400">
                 Not the Office.
@@ -46,14 +46,14 @@ export const Hero: React.FC = () => {
 
           {/* Sub-headline */}
           <FadeIn delay={160}>
-            <p className="text-2xl md:text-3xl font-semibold text-white mb-5">
+            <p className="text-xl md:text-2xl lg:text-3xl font-semibold text-white mb-5">
               AI Automation For All Your Business Needs
             </p>
           </FadeIn>
 
           {/* Paragraph */}
           <FadeIn delay={240}>
-            <p className="text-xl text-slate-400 mb-10 max-w-2xl leading-relaxed font-light">
+            <p className="text-base md:text-xl text-slate-400 mb-10 max-w-2xl leading-relaxed font-light">
               We build custom AI automation for UK tradespeople — handling enquiries, quotes, follow-ups, and chasing so you can focus on the work.
             </p>
           </FadeIn>

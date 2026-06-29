@@ -306,11 +306,11 @@ export const Contact: React.FC = () => {
                           What trade are you in?{' '}
                           <span className="normal-case font-normal text-slate-700">(helps us pick the right automations)</span>
                         </label>
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                           {TRADES.map(trade => (
                             <button key={trade.id} type="button"
                               onClick={() => setFormData({ ...formData, trade: trade.id, painPoints: [], specialistSlug: '' })}
-                              className={`flex items-center gap-2 p-3 rounded-xl border transition-all duration-200 text-sm font-semibold active:scale-95 ${
+                              className={`flex items-center gap-1.5 p-3 rounded-xl border transition-all duration-200 text-xs font-semibold active:scale-95 min-h-[44px] ${
                                 formData.trade === trade.id
                                   ? 'bg-accent-500/15 border-accent-500/50 text-accent-300'
                                   : 'bg-white/5 border-white/10 text-slate-500 hover:bg-white/10 hover:text-slate-300'
