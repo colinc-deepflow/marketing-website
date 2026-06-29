@@ -47,18 +47,18 @@ export const Navigation: React.FC<NavigationProps> = ({ isSubPage = false, onNav
             {isSubPage ? (
               <button
                 onClick={onNavigateHome}
-                className="hidden md:flex items-center gap-2 text-sm font-semibold text-slate-400 hover:text-white transition-colors duration-200"
+                className="hidden nav:flex items-center gap-2 text-sm font-semibold text-slate-400 hover:text-white transition-colors duration-200"
               >
                 <ArrowLeft size={15} />
                 Back to Home
               </button>
             ) : (
-              <div className="hidden md:flex items-center gap-9">
+              <div className="hidden nav:flex items-center gap-7">
                 {navLinks.map((link) => (
                   <a
                     key={link.name}
                     href={link.href}
-                    className="relative text-sm font-semibold text-slate-400 hover:text-white transition-colors duration-200 group py-2"
+                    className="relative text-sm font-semibold text-slate-400 hover:text-white transition-colors duration-200 group py-2 whitespace-nowrap"
                   >
                     {link.name}
                     <span className="absolute bottom-0 left-0 w-0 h-px bg-accent-400 transition-all duration-300 group-hover:w-full ease-out"></span>
@@ -68,7 +68,7 @@ export const Navigation: React.FC<NavigationProps> = ({ isSubPage = false, onNav
             )}
 
             {/* CTA button */}
-            <div className="hidden md:block">
+            <div className="hidden nav:block">
               {isSubPage ? (
                 <Button
                   variant="vibrant"
@@ -86,9 +86,9 @@ export const Navigation: React.FC<NavigationProps> = ({ isSubPage = false, onNav
               )}
             </div>
 
-            {/* Mobile hamburger */}
+            {/* Hamburger — shown below 900px */}
             <button
-              className="md:hidden p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all active:scale-90"
+              className="nav:hidden p-2 rounded-xl text-slate-400 hover:text-white hover:bg-white/5 transition-all active:scale-90"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               aria-label="Toggle Menu"
             >
@@ -101,7 +101,7 @@ export const Navigation: React.FC<NavigationProps> = ({ isSubPage = false, onNav
 
       {/* Mobile Menu */}
       <div
-        className={`fixed inset-0 z-40 md:hidden transition-opacity duration-300 ${
+        className={`fixed inset-0 z-40 nav:hidden transition-opacity duration-300 ${
           isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none invisible'
         }`}
         style={{ backgroundColor: '#020617' }}
