@@ -101,8 +101,8 @@ export const Navigation: React.FC<NavigationProps> = ({ isSubPage = false, onNav
 
       {/* Mobile Menu */}
       <div
-        className={`fixed inset-0 z-40 md:hidden transition-transform duration-500 ${
-          isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+        className={`fixed inset-0 z-40 md:hidden transition-opacity duration-300 ${
+          isMobileMenuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none invisible'
         }`}
         style={{ backgroundColor: '#020617' }}
       >
