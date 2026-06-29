@@ -4,7 +4,7 @@ import { Container, Button, FadeIn } from './ui/Shared';
 
 export const Hero: React.FC = () => {
   return (
-    <div className="relative min-h-screen flex items-center pt-28 pb-24 overflow-hidden bg-slate-950">
+    <div className="relative min-h-screen flex items-center pt-28 pb-24 bg-slate-950" style={{ overflow: 'hidden' }}>
 
       {/* Background layers */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">

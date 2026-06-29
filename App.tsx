@@ -98,7 +98,7 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans">
+    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans" style={{ overflowX: 'hidden', maxWidth: '100vw' }}>
       <Navigation isSubPage={currentPage !== 'home'} onNavigateHome={() => navigateTo('home')} />
       {currentPage === 'home' ? (
         <main>
