@@ -100,9 +100,12 @@ export const Navigation: React.FC<NavigationProps> = ({ isSubPage = false, onNav
       </nav>
 
       {/* Mobile Menu */}
-      <div className={`fixed inset-0 z-40 bg-slate-950 md:hidden transition-all duration-500 ${
-        isMobileMenuOpen ? 'opacity-100 pointer-events-auto visible' : 'opacity-0 pointer-events-none invisible'
-      }`}>
+      <div
+        className={`fixed inset-0 z-40 md:hidden transition-transform duration-500 ${
+          isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+        style={{ backgroundColor: '#020617' }}
+      >
         <div className="flex flex-col gap-8 h-full justify-center px-10">
           {isSubPage ? (
             <button
