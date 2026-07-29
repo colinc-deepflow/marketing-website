@@ -4,40 +4,44 @@ import {
   LayoutDashboard, Calendar, TrendingUp, ShieldCheck,
   Users, Heart, PieChart, Megaphone, Calculator, Mail, Smartphone,
   ExternalLink, ChevronDown, ChevronUp, Clock, Zap, UserX, UserCheck,
-  Briefcase, RefreshCw, Check,
+  Briefcase, RefreshCw,
 } from 'lucide-react';
 import { Container, Section, SectionHeading, FadeIn } from './ui/Shared';
 
 // ── Automation data ────────────────────────────────────────────────────────────
 
 const AUTOMATION_DATA: Record<string, { title: string; desc: string; icon: React.ReactNode; iconBg: string }> = {
+  // Timings kept directional rather than exact. The site previously quoted
+  // precise figures here that contradicted the pricing page (24h vs "minutes"
+  // for lead follow-up, 30min vs 24h for reviews) and didn't match the actual
+  // escalation ladder in loopMonitor.js (24h → 48h → 72h).
   'lead-follow-up': {
     title: 'Lead Follow-Up Email',
-    desc: 'A personalised follow-up goes out 24 hours after every new enquiry. First to respond wins the job.',
+    desc: 'Every new enquiry gets a personalised reply the same day, drafted and waiting for your approval. First to respond usually wins the job.',
     icon: <Mail className="h-5 w-5 text-cyan-400" />,
     iconBg: 'bg-cyan-500/10',
   },
   'quote-reminder': {
     title: 'Quote Reminder',
-    desc: 'Quotes that go quiet after 3 days get an automatic follow-up — no more losing jobs to a slow chase.',
+    desc: 'Quotes that go quiet get chased automatically, then escalated — so you stop losing work to whoever followed up first.',
     icon: <MessageSquare className="h-5 w-5 text-amber-400" />,
     iconBg: 'bg-amber-500/10',
   },
   'invoice-chaser': {
     title: 'Invoice Chaser',
-    desc: 'Professionally escalating payment reminders at 7, 14 and 30 days — no awkward conversations needed.',
+    desc: 'Politely escalating payment reminders that keep going until you\'re paid. No awkward phone calls.',
     icon: <Receipt className="h-5 w-5 text-rose-400" />,
     iconBg: 'bg-rose-500/10',
   },
   'job-appointment-reminder': {
     title: 'Appointment Reminder',
-    desc: 'Customers get automatic reminders 48 hours and 2 hours before every job. No-shows drop significantly.',
+    desc: 'Customers get reminded before the job, so far fewer of them forget you\'re coming.',
     icon: <Calendar className="h-5 w-5 text-emerald-400" />,
     iconBg: 'bg-emerald-500/10',
   },
   'job-completion-review': {
     title: 'Review Request',
-    desc: 'A review request goes out automatically within 30 minutes of a completed job — when it\'s freshest.',
+    desc: 'A review request goes out shortly after the job\'s done, while the customer is still pleased with the work.',
     icon: <Star className="h-5 w-5 text-yellow-400" />,
     iconBg: 'bg-yellow-500/10',
   },
@@ -78,8 +82,10 @@ const AUTOMATION_DATA: Record<string, { title: string; desc: string; icon: React
     iconBg: 'bg-indigo-500/10',
   },
   'new-enquiry-sms': {
+    // Previously claimed "78% of jobs go to whoever responds first" — an
+    // unsourced statistic. Replaced with the same point made honestly.
     title: 'New Enquiry SMS Alert',
-    desc: 'A text to your phone the moment a new enquiry lands — 78% of jobs go to whoever responds first.',
+    desc: 'A text to your phone the moment a new enquiry lands, so you can react before anyone else gets back to them.',
     icon: <Smartphone className="h-5 w-5 text-violet-400" />,
     iconBg: 'bg-violet-500/10',
   },
@@ -133,200 +139,118 @@ const AUTOMATION_DATA: Record<string, { title: string; desc: string; icon: React
   },
 };
 
-// ── Journey stage data ─────────────────────────────────────────────────────────
-
-const STARTER_SLUGS = ['lead-follow-up', 'quote-reminder', 'invoice-chaser'];
-const CORE_ADD_SLUGS = ['job-appointment-reminder', 'job-completion-review'];
-
-const JOURNEY_STAGES = [
+// ── What comes with it, beyond the automations ────────────────────────────────
+// The site used to describe DeepflowAI purely as a list of email automations,
+// which undersold it badly — the portal app, the AI assistant and Call Me were
+// never mentioned anywhere. Only genuinely working features are listed here:
+// push notifications, alerts posted into the portal chat, and a scheduled daily
+// call are all designed but not yet built, so they are deliberately absent.
+const PLATFORM_FEATURES = [
   {
-    id:          'starter',
-    step:        '01',
-    label:       'Starter',
-    headline:    'Stop losing jobs before you even know about them.',
-    sub:         'Three automations that fix the three biggest money leaks in any trades business — leads going cold, quotes going silent, and invoices going unpaid.',
-    impact:      '7+',
-    impactLabel: 'hours saved every week from day one',
-    price:       '£79/mo',
-    setup:       '+ £149 setup',
-    hook:        'Most clients cover the cost in the first week.',
-    slugs:       STARTER_SLUGS,
-    newSlugs:    STARTER_SLUGS,
+    title: 'Your own app',
+    icon: <Smartphone className="h-5 w-5 text-accent-400" />,
+    iconBg: 'bg-accent-500/10',
+    desc: 'Save the portal to your phone\'s home screen and it opens like any other app — no browser, no logging in every time. Approve a quote from the van in ten seconds.',
   },
   {
-    id:          'core',
-    step:        '02',
-    label:       'Core',
-    headline:    'Add the two that keep customers coming back.',
-    sub:         'Appointment reminders cut no-shows overnight. Review requests build your Google reputation while you sleep. Add them to your Starter and the whole system clicks into place.',
-    impact:      '10+',
-    impactLabel: 'hours back in your week',
-    price:       '£127/mo',
-    setup:       '+ £299 setup',
-    hook:        'Most clients add these within the first couple of months.',
-    slugs:       [...STARTER_SLUGS, ...CORE_ADD_SLUGS],
-    newSlugs:    CORE_ADD_SLUGS,
+    title: 'An AI that knows your business',
+    icon: <MessageSquare className="h-5 w-5 text-cyan-400" />,
+    iconBg: 'bg-cyan-500/10',
+    desc: 'Chat to it like you\'d text a mate. "Who still owes me money?" "What\'s on tomorrow?" "Did the Hendersons ever come back on that quote?" It knows every job, customer and message.',
   },
   {
-    id:          'trade',
-    step:        '03',
-    label:       'Trade Pro',
-    headline:    'Five more automations built for how your trade actually works.',
-    sub:         "Emergency callouts, compliance reminders, seasonal campaigns, big quote nurture — the automations your competitors don't have. Pre-configured for your specific trade, ready to run.",
-    impact:      '15+',
-    impactLabel: 'hours saved — the full package',
-    price:       '£197/mo',
-    setup:       '+ £499 setup',
-    hook:        'Select your trade below to see exactly what\'s included.',
-    slugs:       [...STARTER_SLUGS, ...CORE_ADD_SLUGS],
-    newSlugs:    [],
+    title: 'Call me',
+    icon: <Smartphone className="h-5 w-5 text-violet-400" />,
+    iconBg: 'bg-violet-500/10',
+    desc: 'Tap one button and the AI rings your phone with a rundown of what needs your attention. Handy when you\'re driving and can\'t be reading a screen.',
+  },
+  {
+    title: 'Nothing sends without you',
+    icon: <ShieldCheck className="h-5 w-5 text-emerald-400" />,
+    iconBg: 'bg-emerald-500/10',
+    desc: 'Every message the AI writes waits for your approval. Read it, change it, or bin it. Not one word reaches a customer until you\'ve said yes.',
+  },
+  {
+    title: 'It chases for you',
+    icon: <Bell className="h-5 w-5 text-amber-400" />,
+    iconBg: 'bg-amber-500/10',
+    desc: 'When a customer goes quiet on a quote or an invoice, the system keeps following up on its own — and tells you when it\'s time you stepped in personally.',
+  },
+  {
+    title: 'Everything in one place',
+    icon: <LayoutDashboard className="h-5 w-5 text-blue-400" />,
+    iconBg: 'bg-blue-500/10',
+    desc: 'Every job from first enquiry to paid invoice, on one screen. No spreadsheets, no scribbled notes, no wondering what stage anything is at.',
   },
 ];
 
-// ── Interactive package journey ────────────────────────────────────────────────
+// ── What you get, one plan ────────────────────────────────────────────────────
+// Replaced the three-stage Starter/Core/Trade Pro journey (with its £79/£127/£197
+// prices and "2 more unlocked with Core →" upgrade prompts) on 2026-07-27. It was
+// the fourth place pricing was hardcoded and contradicted the new single plan.
 
-function PackageJourney() {
-  const [active, setActive] = useState(JOURNEY_STAGES[0].id);
-  const stageIdx = JOURNEY_STAGES.findIndex(s => s.id === active);
-  const stage    = JOURNEY_STAGES[stageIdx];
-
+function WhatYouGet() {
   return (
     <div className="mb-14">
-
-      {/* ── Step track ── */}
-      <div className="flex items-start gap-0 mb-10">
-        {JOURNEY_STAGES.map((s, i) => {
-          const isActive = s.id === active;
-          const isPast   = i < stageIdx;
-          const isLast   = i === JOURNEY_STAGES.length - 1;
-          return (
-            <React.Fragment key={s.id}>
-              <button
-                onClick={() => setActive(s.id)}
-                className="flex flex-col items-center gap-2 group flex-shrink-0 min-w-0"
-              >
-                <div className={`w-9 h-9 rounded-full border-2 flex items-center justify-center font-black text-xs transition-all duration-300 ${
-                  isActive
-                    ? 'bg-accent-500 border-accent-500 text-slate-900 shadow-[0_0_20px_rgba(6,182,212,0.5)]'
-                    : isPast
-                    ? 'bg-accent-500/20 border-accent-500/50 text-accent-400'
-                    : 'bg-slate-900 border-white/15 text-slate-500 group-hover:border-white/30 group-hover:text-slate-300'
-                }`}>
-                  {isPast ? <Check className="w-3.5 h-3.5" /> : s.step}
-                </div>
-                <span className={`text-[10px] font-bold uppercase tracking-wider text-center transition-colors ${
-                  isActive ? 'text-white' : isPast ? 'text-accent-400/60' : 'text-slate-500 group-hover:text-slate-300'
-                }`}>
-                  {s.label}
-                </span>
-              </button>
-
-              {/* connector line between nodes */}
-              {!isLast && (
-                <div className="flex-1 h-px mt-5 mx-2 transition-colors duration-500">
-                  <div className={`h-full transition-colors duration-500 ${
-                    stageIdx > i ? 'bg-accent-500' : 'bg-white/8'
-                  }`} />
-                </div>
-              )}
-            </React.Fragment>
-          );
-        })}
-      </div>
-
-      {/* ── Content panel ── */}
-      <div className="rounded-2xl bg-slate-950/80 border border-white/10 overflow-hidden transition-all duration-300">
+      <div className="rounded-2xl bg-slate-950/80 border border-white/10 overflow-hidden">
         <div className="grid lg:grid-cols-2 gap-0">
 
-          {/* Left: pitch */}
+          {/* Left: the pitch */}
           <div className="p-8 lg:p-10 border-b lg:border-b-0 lg:border-r border-white/8 flex flex-col">
             <div className="inline-flex self-start items-center gap-2 text-xs font-bold text-accent-400 uppercase tracking-widest mb-5 bg-accent-500/10 border border-accent-500/20 px-3 py-1.5 rounded-full">
-              {stage.label}
+              One plan
             </div>
             <h3 className="text-2xl lg:text-3xl font-extrabold text-white mb-4 leading-tight">
-              {stage.headline}
+              Everything, from the first enquiry to the paid invoice.
             </h3>
-            <p className="text-slate-400 leading-relaxed mb-8 flex-1">{stage.sub}</p>
+            <p className="text-slate-400 leading-relaxed mb-8 flex-1">
+              No packages to compare and nothing held back for a higher tier. You get all five
+              core automations, five more built specifically for your trade, the app on your
+              phone, and an AI assistant that knows every job you've got on.
+            </p>
 
             <div className="flex flex-wrap gap-3 mb-6">
-              <div className="bg-emerald-500/8 border border-emerald-500/20 rounded-xl px-5 py-3">
-                <p className="text-2xl font-black text-emerald-400 leading-none">{stage.impact}</p>
-                <p className="text-xs text-slate-500 mt-1 leading-snug max-w-[130px]">{stage.impactLabel}</p>
-              </div>
               <div className="bg-slate-800/60 border border-white/8 rounded-xl px-5 py-3 flex flex-col justify-center">
-                <p className="text-white font-bold">{stage.price}</p>
-                <p className="text-slate-600 text-xs mt-0.5">{stage.setup} · 2 months free annually</p>
+                <p className="text-white font-bold text-lg">
+                  <span className="text-slate-500 text-sm font-normal line-through mr-1.5">£200</span>
+                  £150<span className="text-slate-500 text-sm font-normal">/month</span>
+                </p>
+                <p className="text-amber-400/80 text-xs mt-0.5">Founding rate · first 5 businesses · locked for life</p>
+              </div>
+              <div className="bg-emerald-500/8 border border-emerald-500/20 rounded-xl px-5 py-3 flex flex-col justify-center">
+                <p className="text-emerald-400 font-bold text-lg">10</p>
+                <p className="text-xs text-slate-500 mt-0.5 leading-snug max-w-[130px]">automations, all included</p>
               </div>
             </div>
 
-            <p className="text-slate-500 text-sm italic">{stage.hook}</p>
+            <p className="text-slate-500 text-sm italic">
+              Nothing is ever sent to a customer without your approval.
+            </p>
           </div>
 
-          {/* Right: automation list */}
+          {/* Right: the core five */}
           <div className="p-8 lg:p-10">
-            {stage.id !== 'trade' ? (
-              <>
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-5">
-                  {stage.id === 'starter' ? 'Your 3 automations' : 'All 5 automations'}
-                </p>
-                <div className="space-y-2.5">
-                  {stage.slugs.map(slug => {
-                    const data  = AUTOMATION_DATA[slug];
-                    const isNew = stage.newSlugs.includes(slug);
-                    if (!data) return null;
-                    return (
-                      <div key={slug} className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all duration-300 ${
-                        isNew
-                          ? 'bg-emerald-500/6 border-emerald-500/25'
-                          : 'bg-white/[0.03] border-white/8'
-                      }`}>
-                        <div className={`rounded-lg flex items-center justify-center w-8 h-8 flex-shrink-0 ${data.iconBg}`}>
-                          {data.icon}
-                        </div>
-                        <span className={`text-sm font-medium flex-1 ${isNew ? 'text-white' : 'text-slate-400'}`}>
-                          {data.title}
-                        </span>
-                        {isNew && stage.id === 'core' && (
-                          <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full uppercase tracking-wider flex-shrink-0">
-                            + Added
-                          </span>
-                        )}
-                      </div>
-                    );
-                  })}
-                  {stage.id === 'starter' && (
-                    <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-dashed border-white/10 mt-1">
-                      <div className="w-8 h-8 rounded-lg bg-white/5 flex-shrink-0" />
-                      <span className="text-sm text-slate-600 italic">2 more unlocked with Core →</span>
+            <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-5">
+              The 5 core automations
+            </p>
+            <div className="space-y-2.5">
+              {CORE_SLUGS.map(slug => {
+                const data = AUTOMATION_DATA[slug];
+                if (!data) return null;
+                return (
+                  <div key={slug} className="flex items-center gap-3 px-4 py-3 rounded-xl border border-white/8 bg-white/[0.03]">
+                    <div className={`rounded-lg flex items-center justify-center w-8 h-8 flex-shrink-0 ${data.iconBg}`}>
+                      {data.icon}
                     </div>
-                  )}
-                </div>
-              </>
-            ) : (
-              <>
-                <p className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-5">
-                  Everything in Core, plus 5 trade-specific
-                </p>
-                <div className="space-y-2.5 mb-4">
-                  {[...STARTER_SLUGS, ...CORE_ADD_SLUGS].map(slug => {
-                    const data = AUTOMATION_DATA[slug];
-                    if (!data) return null;
-                    return (
-                      <div key={slug} className="flex items-center gap-3 px-4 py-2.5 rounded-xl border border-white/8 bg-white/[0.03]">
-                        <div className={`rounded-lg flex items-center justify-center w-7 h-7 flex-shrink-0 ${data.iconBg}`}>
-                          {data.icon}
-                        </div>
-                        <span className="text-sm text-slate-400">{data.title}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-accent-500/30 bg-accent-500/6 mt-4">
-                  <span className="text-accent-300 font-bold text-sm">+ 5 built for your trade</span>
-                  <span className="text-slate-500 text-xs">↓ pick your trade below</span>
-                </div>
-              </>
-            )}
+                    <span className="text-sm font-medium text-slate-300 flex-1">{data.title}</span>
+                  </div>
+                );
+              })}
+              <div className="flex items-center gap-3 px-4 py-3 rounded-xl border border-accent-500/30 bg-accent-500/6 mt-1">
+                <span className="text-accent-300 font-bold text-sm flex-1">+ 5 built for your trade</span>
+                <span className="text-slate-500 text-xs">pick yours below ↓</span>
+              </div>
+            </div>
           </div>
 
         </div>
@@ -522,21 +446,21 @@ export const Features: React.FC = () => {
       <Section id="features" className="bg-slate-900">
         <Container>
           <SectionHeading
-            title={<>What's in your <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-indigo-400">package</span></>}
-            subtitle="Start with 3 core automations — the ones that make the biggest difference on day one. Add more as your business grows. We configure everything for you, no software to learn."
+            title={<>What you <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-indigo-400">get</span></>}
+            subtitle="One plan with everything in it. We set the whole lot up for you — there's no software to learn and nothing to configure yourself."
             center
             dark
           />
 
-          {/* ── Package journey ── */}
-          <PackageJourney />
+          {/* ── What you get ── */}
+          <WhatYouGet />
 
           {/* ── Trade-specific extras ── */}
           <FadeIn delay={200}>
             <div className="flex items-center gap-3 mb-5">
               <div className="h-px flex-1 bg-white/5" />
               <span className="text-xs font-bold text-slate-500 uppercase tracking-widest px-3">
-                Trade Pro adds 5 more — built specifically for your trade
+                Plus 5 more, built specifically for your trade
               </span>
               <div className="h-px flex-1 bg-white/5" />
             </div>
@@ -575,7 +499,7 @@ export const Features: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-accent-500/10 border border-accent-500/20">
                   <span className="text-accent-400 font-bold text-lg">{totalForTrade}</span>
-                  <span className="text-slate-400 text-sm">automations in Trade Pro</span>
+                  <span className="text-slate-400 text-sm">automations, all included</span>
                 </div>
               </div>
 
@@ -603,8 +527,36 @@ export const Features: React.FC = () => {
         </Container>
       </Section>
 
+      {/* ── The platform itself ──
+          Added 2026-07-27. The site previously described DeepflowAI purely as a
+          set of email automations and never mentioned the portal, the phone app,
+          the AI assistant or Call Me at all. */}
+      <Section id="platform" className="bg-slate-950">
+        <Container>
+          <SectionHeading
+            title={<>It's more than <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-indigo-400">automated emails</span></>}
+            subtitle="The automations do the chasing. This is the bit you actually use — on your phone, in the van, between jobs."
+            center
+            dark
+          />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {PLATFORM_FEATURES.map((f, i) => (
+              <FadeIn key={f.title} delay={i * 80}>
+                <div className="h-full rounded-2xl bg-slate-900/60 border border-white/10 hover:border-white/20 transition-all duration-300 p-6 flex flex-col">
+                  <div className={`rounded-xl ${f.iconBg} flex items-center justify-center h-10 w-10 mb-4 flex-shrink-0`}>
+                    {f.icon}
+                  </div>
+                  <h3 className="font-bold text-white mb-2">{f.title}</h3>
+                  <p className="text-sm text-slate-400 leading-relaxed flex-1">{f.desc}</p>
+                </div>
+              </FadeIn>
+            ))}
+          </div>
+        </Container>
+      </Section>
+
       {/* ── Specialist Services ── */}
-      <Section id="specialist" className="bg-slate-950">
+      <Section id="specialist" className="bg-slate-900">
         <Container>
           <SectionHeading
             title={<>Specialist <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 to-orange-400">Services</span></>}

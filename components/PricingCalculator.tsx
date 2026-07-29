@@ -122,9 +122,9 @@ export const PricingCalculator: React.FC = () => {
 
               <div className="text-center mb-5">
                 <p className="text-slate-500 text-xs">
-                  The Starter package — 3 core automations — costs{' '}
-                  <strong className="text-slate-400">£79/month</strong> + £149 setup.
-                  Most clients see it paid back within the first month.
+                  One plan, everything included —{' '}
+                  <strong className="text-slate-400">£200/month</strong>, no setup fee.
+                  Our first 5 businesses pay <strong className="text-amber-400/80">£150/month, locked for life</strong>.
                 </p>
               </div>
 

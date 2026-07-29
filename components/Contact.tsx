@@ -6,8 +6,6 @@ import { Container, Section, Button, FadeIn } from './ui/Shared';
 
 type TeamSize = 'Just me' | '2–3 people' | '4–10 people' | '10+ people';
 
-type PackageTier = 'starter' | 'core' | 'trade';
-
 interface FormData {
   businessName: string;
   name: string;
@@ -19,7 +17,6 @@ interface FormData {
   specialistSlug: string;
   notes: string;
   callConsent: boolean;
-  packageTier: PackageTier;
 }
 
 // ── Trade profiles (must match server/config/tradeProfiles.js) ────────────────
@@ -126,7 +123,6 @@ export const Contact: React.FC = () => {
     specialistSlug: '',
     notes: '',
     callConsent: false,
-    packageTier: 'core',
   });
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -150,7 +146,6 @@ export const Contact: React.FC = () => {
           specialistSlug: formData.specialistSlug || null,
           notes: formData.notes,
           callConsent: formData.callConsent,
-          packageTier: formData.packageTier,
           submittedAt: new Date().toISOString(),
           source: 'website_contact_form',
         }),
@@ -354,164 +349,64 @@ export const Contact: React.FC = () => {
                             )}
                           </h3>
                           <p className="text-slate-500 text-sm mt-0.5">
-                            {formData.packageTier === 'starter'
-                              ? 'Your 3 core automations are included and ready to go.'
-                              : formData.packageTier === 'core'
-                              ? 'Your 5 core automations are included. Pick your specialist automation below.'
-                              : 'All core and trade automations are included. Select the ones that matter most.'}
+                            Every automation is included — tell us which problems bite hardest
+                            so we know what to set up first.
                           </p>
                         </div>
                       </div>
 
-                      {/* Package tier selector */}
-                      <div>
-                        <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-3">
-                          Which package are you interested in?
-                        </p>
-                        <div className="space-y-2">
-                          {([
-                            {
-                              id: 'starter' as PackageTier,
-                              label: 'Starter',
-                              price: '£79/mo',
-                              desc: 'Lead follow-up, quote reminder & invoice chaser — the 3 biggest money leaks fixed.',
-                              count: '3 automations',
-                            },
-                            {
-                              id: 'core' as PackageTier,
-                              label: 'Core',
-                              price: '£127/mo',
-                              desc: 'All 5 core automations + 1 specialist trade automation. Most popular.',
-                              count: '6 automations',
-                              popular: true,
-                            },
-                            {
-                              id: 'trade' as PackageTier,
-                              label: 'Trade Pro',
-                              price: '£197/mo',
-                              desc: 'Every automation in the library — the full suite built for your specific trade.',
-                              count: '10 automations',
-                            },
-                          ] as const).map(pkg => (
-                            <button
-                              key={pkg.id}
-                              type="button"
-                              onClick={() => setFormData(prev => ({
-                                ...prev,
-                                packageTier: pkg.id,
-                                specialistSlug: pkg.id === 'starter' ? '' : prev.specialistSlug,
-                                painPoints: pkg.id === 'starter' ? [] : prev.painPoints,
-                              }))}
-                              className={`w-full p-4 rounded-xl border transition-all duration-200 text-left active:scale-[0.99] relative ${
-                                formData.packageTier === pkg.id
-                                  ? 'bg-accent-500/15 border-accent-500/40'
-                                  : 'bg-white/5 border-white/10 hover:bg-white/[0.08] hover:border-white/20'
-                              }`}
-                            >
-                              {'popular' in pkg && pkg.popular && (
-                                <span className="absolute top-3 right-3 text-[10px] font-bold text-accent-400 bg-accent-500/10 border border-accent-500/20 px-2 py-0.5 rounded-full">
-                                  Most popular
-                                </span>
-                              )}
-                              <div className="flex items-center gap-3">
-                                <div className={`h-4 w-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
-                                  formData.packageTier === pkg.id
-                                    ? 'border-accent-500 bg-accent-500'
-                                    : 'border-white/20'
-                                }`}>
-                                  {formData.packageTier === pkg.id && (
-                                    <div className="h-1.5 w-1.5 rounded-full bg-white" />
-                                  )}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-baseline gap-2">
-                                    <span className={`text-sm font-bold ${formData.packageTier === pkg.id ? 'text-white' : 'text-slate-300'}`}>
-                                      {pkg.label}
-                                    </span>
-                                    <span className="text-xs text-accent-400 font-semibold">{pkg.price}</span>
-                                    <span className="text-xs text-slate-600">{pkg.count}</span>
-                                  </div>
-                                  <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">{pkg.desc}</p>
-                                </div>
-                              </div>
-                            </button>
-                          ))}
-                        </div>
-                        <p className="text-[10px] text-slate-700 mt-2">Not sure? Core is a great starting point — you can always add more later.</p>
-                      </div>
-
-                      {/* Core automations — shown as already included in chosen package */}
-                      <div className="rounded-xl border border-white/5 bg-white/[0.03] p-4">
-                        <p className="text-[10px] font-bold text-slate-600 uppercase tracking-widest mb-2.5">
-                          {formData.packageTier === 'starter'
-                            ? 'Included in Starter:'
-                            : formData.packageTier === 'core'
-                            ? 'Included in Core:'
-                            : 'Included in Trade Pro:'}
+                      {/* What's included — one plan, no choosing.
+                          The three-way package selector that used to live here was
+                          removed on 2026-07-27 with the move to single-plan pricing:
+                          it asked the buyer to make a decision they no longer have,
+                          and contradicted the pricing page. */}
+                      <div className="rounded-xl border border-emerald-500/20 bg-emerald-500/[0.06] p-4">
+                        <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mb-2.5">
+                          Everything below is included
                         </p>
                         <div className="flex flex-wrap gap-2">
-                          {(formData.packageTier === 'starter'
-                            ? ['Lead Follow-Up', 'Quote Reminder', 'Invoice Chaser']
-                            : ['Lead Follow-Up', 'Quote Reminder', 'Invoice Chaser', 'Appointment Reminder', 'Review Request']
-                          ).map(label => (
+                          {['Lead Follow-Up', 'Quote Reminder', 'Invoice Chaser', 'Appointment Reminder', 'Review Request'].map(label => (
                             <span key={label} className="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-medium">
                               ✓ {label}
                             </span>
                           ))}
-                          {formData.packageTier === 'trade' && (
-                            <span className="text-xs px-2.5 py-1 rounded-full bg-accent-500/10 border border-accent-500/20 text-accent-400 font-medium">
-                              + 5 trade automations
-                            </span>
-                          )}
-                          {formData.packageTier === 'core' && formData.specialistSlug && (
-                            <span className="text-xs px-2.5 py-1 rounded-full bg-accent-500/10 border border-accent-500/20 text-accent-400 font-medium">
-                              ✓ {step2Points.find(p => p.slug === formData.specialistSlug)?.label || '1 specialist automation'}
-                            </span>
-                          )}
-                          {formData.packageTier === 'core' && !formData.specialistSlug && (
-                            <span className="text-xs px-2.5 py-1 rounded-full bg-white/5 border border-dashed border-white/20 text-slate-500 font-medium">
-                              + pick 1 specialist below
-                            </span>
-                          )}
+                          <span className="text-xs px-2.5 py-1 rounded-full bg-accent-500/10 border border-accent-500/20 text-accent-400 font-medium">
+                            + 5 built for {selectedTrade ? selectedTrade.name.toLowerCase() + 's' : 'your trade'}
+                          </span>
                         </div>
+                        <p className="text-[10px] text-slate-500 mt-2.5">
+                          One plan, no tiers. Picking below just tells us what to prioritise on day one.
+                        </p>
                       </div>
 
-                      {/* Specialist automation picker — hidden for Starter, radio for Core, checkbox for Trade Pro */}
-                      {formData.packageTier !== 'starter' && formData.trade && step2Points.length > 0 && (
+                      {/* Priority picker. Multi-select now that everything is included —
+                          this no longer decides what they GET, only what we set up first.
+                          `specialistSlug` is still sent as the first thing they picked, so
+                          Aria knows which automation to lead with on the discovery call. */}
+                      {formData.trade && step2Points.length > 0 && (
                         <div>
                           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">
-                            {formData.packageTier === 'core'
-                              ? 'Choose your specialist automation'
-                              : 'Which matter most to you?'}
+                            Which of these cost you the most time?
                           </p>
                           <p className="text-xs text-slate-600 mb-3">
-                            {formData.packageTier === 'core'
-                              ? 'Your Core package includes 1 specialist automation — pick the one that fits best.'
-                              : 'All five are included in Trade Pro. Select the ones most relevant to your business.'}
+                            Pick as many as apply. They're all included — this just tells us
+                            what to switch on first.
                           </p>
                           <div className="space-y-2">
                             {step2Points.map(item => {
-                              const isSelected = formData.packageTier === 'core'
-                                ? formData.specialistSlug === item.slug
-                                : formData.painPoints.includes(item.label);
+                              const isSelected = formData.painPoints.includes(item.label);
                               return (
                                 <button key={item.slug} type="button"
                                   onClick={() => {
-                                    if (formData.packageTier === 'core') {
-                                      const selecting = formData.specialistSlug !== item.slug;
-                                      setFormData(prev => ({
-                                        ...prev,
-                                        specialistSlug: selecting ? item.slug : '',
-                                        painPoints: selecting ? [item.label] : [],
-                                      }));
-                                    } else {
-                                      setFormData(prev => ({
-                                        ...prev,
-                                        painPoints: prev.painPoints.includes(item.label)
-                                          ? prev.painPoints.filter(p => p !== item.label)
-                                          : [...prev.painPoints, item.label],
-                                      }));
-                                    }
+                                    setFormData(prev => {
+                                      const painPoints = prev.painPoints.includes(item.label)
+                                        ? prev.painPoints.filter(p => p !== item.label)
+                                        : [...prev.painPoints, item.label];
+                                      // Lead automation = first one still selected.
+                                      const firstLabel = painPoints[0];
+                                      const firstSlug  = step2Points.find(p => p.label === firstLabel)?.slug || '';
+                                      return { ...prev, painPoints, specialistSlug: firstSlug };
+                                    });
                                   }}
                                   className={`w-full p-4 rounded-xl border transition-all duration-200 flex items-start gap-3 text-left active:scale-[0.99] ${
                                     isSelected
@@ -519,19 +414,11 @@ export const Contact: React.FC = () => {
                                       : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/[0.08] hover:border-white/20'
                                   }`}
                                 >
-                                  {formData.packageTier === 'core' ? (
-                                    <div className={`mt-0.5 h-4 w-4 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
-                                      isSelected ? 'border-accent-500 bg-accent-500' : 'border-white/20'
-                                    }`}>
-                                      {isSelected && <div className="h-1.5 w-1.5 rounded-full bg-white" />}
-                                    </div>
-                                  ) : (
-                                    <div className={`mt-0.5 h-4 w-4 rounded flex items-center justify-center flex-shrink-0 transition-all ${
-                                      isSelected ? 'bg-accent-500 text-white' : 'bg-white/10'
-                                    }`}>
-                                      {isSelected && <Check size={10} strokeWidth={3.5} />}
-                                    </div>
-                                  )}
+                                  <div className={`mt-0.5 h-4 w-4 rounded flex items-center justify-center flex-shrink-0 transition-all ${
+                                    isSelected ? 'bg-accent-500 text-white' : 'bg-white/10'
+                                  }`}>
+                                    {isSelected && <Check size={10} strokeWidth={3.5} />}
+                                  </div>
                                   <div>
                                     <div className="text-sm font-bold">{item.label}</div>
                                     <div className="text-xs text-slate-600 mt-0.5">{item.desc}</div>
@@ -540,14 +427,6 @@ export const Contact: React.FC = () => {
                               );
                             })}
                           </div>
-                          {formData.packageTier === 'core' && !formData.specialistSlug && (
-                            <p className="text-xs text-slate-600 pt-2">← Select one to add to your Core package</p>
-                          )}
-                          {formData.packageTier === 'core' && formData.specialistSlug && (
-                            <p className="text-xs text-accent-400 pt-2">
-                              ✓ {step2Points.find(p => p.slug === formData.specialistSlug)?.label} added to your Core package
-                            </p>
-                          )}
                         </div>
                       )}
 
