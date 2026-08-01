@@ -142,9 +142,17 @@ const AUTOMATION_DATA: Record<string, { title: string; desc: string; icon: React
 // ── What comes with it, beyond the automations ────────────────────────────────
 // The site used to describe DeepflowAI purely as a list of email automations,
 // which undersold it badly — the portal app, the AI assistant and Call Me were
-// never mentioned anywhere. Only genuinely working features are listed here:
-// push notifications, alerts posted into the portal chat, and a scheduled daily
-// call are all designed but not yet built, so they are deliberately absent.
+// never mentioned anywhere. Only genuinely working features are listed here.
+//
+// DELIBERATELY ABSENT, and each for a reason:
+//   - push notifications: designed, not built (task #122)
+//   - alerts posted into the portal chat: not built
+//   - a scheduled daily call: the cron exists but the briefing doesn't yet
+//     include open loops (#96)
+//   - PHOTO ENQUIRIES and VOICE NOTES: these work, but only over customer-facing
+//     WhatsApp, and whether that channel survives is undecided (#56). Over email
+//     a photo would bounce at 150KB (#88). Add them once both are settled — they
+//     are two of the most demonstrable features in the product and worth having.
 const PLATFORM_FEATURES = [
   {
     title: 'Your own app',
@@ -175,6 +183,16 @@ const PLATFORM_FEATURES = [
     icon: <Bell className="h-5 w-5 text-amber-400" />,
     iconBg: 'bg-amber-500/10',
     desc: 'When a customer goes quiet on a quote or an invoice, the system keeps following up on its own — and tells you when it\'s time you stepped in personally.',
+  },
+  {
+    // The reply handling was missing entirely, which undersold the product badly.
+    // It is the thing competitors don't do — they send email, they don't read it.
+    // Backed by replyHandler.js: classifies intent, drafts a response, queues it
+    // for approval. Nothing auto-sends (auto-send was removed 30 July 2026).
+    title: 'It reads the replies too',
+    icon: <Mail className="h-5 w-5 text-rose-400" />,
+    iconBg: 'bg-rose-500/10',
+    desc: 'When a customer writes back, the AI reads it and works out what they actually want — a question, a change of date, a query about the bill, or a yes. The reply is written and waiting for you before you\'ve got your phone out.',
   },
   {
     title: 'Everything in one place',
