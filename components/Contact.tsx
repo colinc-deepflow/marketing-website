@@ -341,7 +341,7 @@ export const Contact: React.FC = () => {
                         <div className="h-9 w-9 bg-accent-500 rounded-lg flex items-center justify-center font-black text-sm shadow-lg shadow-accent-500/20 flex-shrink-0">2</div>
                         <div>
                           <h3 className="text-xl font-bold text-white">
-                            What's slowing you down?
+                            What you'll get
                             {selectedTrade && (
                               <span className="ml-2 text-sm font-normal text-slate-500">
                                 {selectedTrade.emoji} {selectedTrade.name}
@@ -349,8 +349,7 @@ export const Contact: React.FC = () => {
                             )}
                           </h3>
                           <p className="text-slate-500 text-sm mt-0.5">
-                            Every automation is included — tell us which problems bite hardest
-                            so we know what to set up first.
+                            All ten automations, every time. Nothing to choose between.
                           </p>
                         </div>
                       </div>
@@ -375,7 +374,7 @@ export const Contact: React.FC = () => {
                           </span>
                         </div>
                         <p className="text-[10px] text-slate-500 mt-2.5">
-                          One plan, no tiers. Picking below just tells us what to prioritise on day one.
+                          One plan, no tiers. Everyone gets all ten.
                         </p>
                       </div>
 
@@ -385,12 +384,23 @@ export const Contact: React.FC = () => {
                           Aria knows which automation to lead with on the discovery call. */}
                       {formData.trade && step2Points.length > 0 && (
                         <div>
+                          {/* ── ONE question, not a shopping list ──
+                              This was a multi-select checklist headed "which of these
+                              cost you the most time — pick as many as apply". With a
+                              single plan that reads as though the choice changes what
+                              you get, which it doesn't. Colin flagged it on 30 July.
+
+                              Kept as ONE optional pick rather than removed, because
+                              Aria opens the discovery call with "you mentioned X on the
+                              form — is that still the worst one?". Without it her first
+                              real question is generic, and that's the moment the call
+                              either feels personal or feels like a cold call. */}
                           <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">
-                            Which of these cost you the most time?
+                            What's costing you the most time right now?
                           </p>
                           <p className="text-xs text-slate-600 mb-3">
-                            Pick as many as apply. They're all included — this just tells us
-                            what to switch on first.
+                            Optional — pick one. It doesn't change what you get, it just
+                            means we're not wasting your time on the call.
                           </p>
                           <div className="space-y-2">
                             {step2Points.map(item => {
@@ -399,13 +409,13 @@ export const Contact: React.FC = () => {
                                 <button key={item.slug} type="button"
                                   onClick={() => {
                                     setFormData(prev => {
-                                      const painPoints = prev.painPoints.includes(item.label)
-                                        ? prev.painPoints.filter(p => p !== item.label)
-                                        : [...prev.painPoints, item.label];
-                                      // Lead automation = first one still selected.
-                                      const firstLabel = painPoints[0];
-                                      const firstSlug  = step2Points.find(p => p.label === firstLabel)?.slug || '';
-                                      return { ...prev, painPoints, specialistSlug: firstSlug };
+                                      // Single select — tapping the chosen one clears it.
+                                      const isOn = prev.painPoints.includes(item.label);
+                                      return {
+                                        ...prev,
+                                        painPoints:     isOn ? [] : [item.label],
+                                        specialistSlug: isOn ? '' : item.slug,
+                                      };
                                     });
                                   }}
                                   className={`w-full p-4 rounded-xl border transition-all duration-200 flex items-start gap-3 text-left active:scale-[0.99] ${
@@ -414,7 +424,9 @@ export const Contact: React.FC = () => {
                                       : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/[0.08] hover:border-white/20'
                                   }`}
                                 >
-                                  <div className={`mt-0.5 h-4 w-4 rounded flex items-center justify-center flex-shrink-0 transition-all ${
+                                  {/* Round, not square — it's a pick-one now, and a
+                                      checkbox shape would still read as multi-select. */}
+                                  <div className={`mt-0.5 h-4 w-4 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${
                                     isSelected ? 'bg-accent-500 text-white' : 'bg-white/10'
                                   }`}>
                                     {isSelected && <Check size={10} strokeWidth={3.5} />}
