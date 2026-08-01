@@ -473,9 +473,28 @@ export const Features: React.FC = () => {
           {/* ── What you get ── */}
           <WhatYouGet />
 
-          {/* ── Trade-specific extras ── */}
+          {/* ── MOBILE: one line instead of the whole catalogue ──
+              The trade browser below is 8 tabs and 5 cards each — genuinely
+              useful on a laptop where someone can browse, but on a phone it's a
+              wall of scrolling in the middle of the pitch, before they've been
+              convinced of anything. Reference material, not persuasion.
+              Desktop keeps the full thing. */}
           <FadeIn delay={200}>
-            <div className="flex items-center gap-3 mb-5">
+            <div className="md:hidden rounded-2xl border border-white/10 bg-slate-950/60 px-5 py-6 text-center">
+              <p className="text-white font-bold mb-1.5">
+                Plus 5 more built for your trade
+              </p>
+              <p className="text-sm text-slate-400 leading-relaxed">
+                Plumber, electrician, gas engineer, builder, roofer, painter, landscaper
+                or joiner — you get five extra automations written for the way your trade
+                actually works.
+              </p>
+            </div>
+          </FadeIn>
+
+          {/* ── Trade-specific extras — desktop only ── */}
+          <FadeIn delay={200}>
+            <div className="hidden md:flex items-center gap-3 mb-5">
               <div className="h-px flex-1 bg-white/5" />
               <span className="text-xs font-bold text-slate-500 uppercase tracking-widest px-3">
                 Plus 5 more, built specifically for your trade
@@ -485,7 +504,7 @@ export const Features: React.FC = () => {
           </FadeIn>
 
           {/* Trade selector */}
-          <FadeIn delay={240}>
+          <FadeIn delay={240} className="hidden md:block">
             <div className="flex flex-wrap gap-2 mb-8 justify-center">
               {TRADE_PROFILES.map(trade => (
                 <button
@@ -504,8 +523,8 @@ export const Features: React.FC = () => {
             </div>
           </FadeIn>
 
-          {/* Trade profile panel */}
-          <FadeIn delay={280}>
+          {/* Trade profile panel — desktop only, see the mobile summary above */}
+          <FadeIn delay={280} className="hidden md:block">
             <div className="rounded-2xl border border-white/10 bg-slate-950/60 p-6 md:p-8">
               {/* Header */}
               <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
