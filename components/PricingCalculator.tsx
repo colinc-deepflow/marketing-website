@@ -2,7 +2,13 @@ import React, { useState } from 'react';
 import { TrendingUp, Clock, DollarSign, ArrowRight } from 'lucide-react';
 import { Container, Section, SectionHeading, Button, FadeIn } from './ui/Shared';
 
-export const PricingCalculator: React.FC = () => {
+interface PricingCalculatorProps {
+  /** Takes the visitor to the pricing page. Optional so the component still
+   *  renders standalone — it just hides the link if no handler is given. */
+  onSeePricing?: () => void;
+}
+
+export const PricingCalculator: React.FC<PricingCalculatorProps> = ({ onSeePricing }) => {
   const [teamSize, setTeamSize] = useState(5);
   const [adminHours, setAdminHours] = useState(15);
 
@@ -120,11 +126,25 @@ export const PricingCalculator: React.FC = () => {
                 *Based on a typical 70% reduction in admin time. Actual savings may vary. Figures in GBP.
               </p>
 
+              {/* Deliberately no price. This section is about what the admin is
+                  costing them — putting our price next to it makes the reader do
+                  the comparison before they've felt the problem. Pricing has its
+                  own page. */}
               <div className="text-center mb-5">
                 <p className="text-slate-500 text-xs">
-                  One plan, everything included —{' '}
-                  <strong className="text-slate-400">£200/month</strong>, no setup fee.
-                  Our first 5 businesses pay <strong className="text-amber-400/80">£150/month, locked for life</strong>.
+                  One plan, everything included, no setup fee.
+                  {onSeePricing && (
+                    <>
+                      {' '}
+                      <button
+                        type="button"
+                        onClick={onSeePricing}
+                        className="text-accent-400 hover:text-accent-300 underline underline-offset-2"
+                      >
+                        See what it costs
+                      </button>
+                    </>
+                  )}
                 </p>
               </div>
 

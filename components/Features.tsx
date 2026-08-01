@@ -209,17 +209,17 @@ function WhatYouGet() {
               phone, and an AI assistant that knows every job you've got on.
             </p>
 
+            {/* No price here on purpose — pricing lives on its own page, so this
+                section can sell what you get without the number competing for
+                attention. See components/PricingPage.tsx. */}
             <div className="flex flex-wrap gap-3 mb-6">
-              <div className="bg-slate-800/60 border border-white/8 rounded-xl px-5 py-3 flex flex-col justify-center">
-                <p className="text-white font-bold text-lg">
-                  <span className="text-slate-500 text-sm font-normal line-through mr-1.5">£200</span>
-                  £150<span className="text-slate-500 text-sm font-normal">/month</span>
-                </p>
-                <p className="text-amber-400/80 text-xs mt-0.5">Founding rate · first 5 businesses · locked for life</p>
-              </div>
               <div className="bg-emerald-500/8 border border-emerald-500/20 rounded-xl px-5 py-3 flex flex-col justify-center">
                 <p className="text-emerald-400 font-bold text-lg">10</p>
                 <p className="text-xs text-slate-500 mt-0.5 leading-snug max-w-[130px]">automations, all included</p>
+              </div>
+              <div className="bg-slate-800/60 border border-white/8 rounded-xl px-5 py-3 flex flex-col justify-center">
+                <p className="text-white font-bold text-lg">8</p>
+                <p className="text-xs text-slate-500 mt-0.5 leading-snug max-w-[130px]">trades supported</p>
               </div>
             </div>
 

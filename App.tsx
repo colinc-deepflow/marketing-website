@@ -106,7 +106,7 @@ function App() {
           <Problem />
           <Solution />
           <Features />
-          <PricingCalculator />
+          <PricingCalculator onSeePricing={() => navigateTo('pricing')} />
           <Dashboard />
           <InteractiveDemo />
           <Contact />
