@@ -378,69 +378,35 @@ export const Contact: React.FC = () => {
                         </p>
                       </div>
 
-                      {/* Priority picker. Multi-select now that everything is included —
-                          this no longer decides what they GET, only what we set up first.
-                          `specialistSlug` is still sent as the first thing they picked, so
-                          Aria knows which automation to lead with on the discovery call. */}
-                      {formData.trade && step2Points.length > 0 && (
-                        <div>
-                          {/* ── ONE question, not a shopping list ──
-                              This was a multi-select checklist headed "which of these
-                              cost you the most time — pick as many as apply". With a
-                              single plan that reads as though the choice changes what
-                              you get, which it doesn't. Colin flagged it on 30 July.
+                      {/* ── THE AUTOMATION PICKER IS GONE (3 August 2026) ──────────
+                          Removed entirely rather than reduced again.
 
-                              Kept as ONE optional pick rather than removed, because
-                              Aria opens the discovery call with "you mentioned X on the
-                              form — is that still the worst one?". Without it her first
-                              real question is generic, and that's the moment the call
-                              either feels personal or feels like a cold call. */}
-                          <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">
-                            What's costing you the most time right now?
-                          </p>
-                          <p className="text-xs text-slate-600 mb-3">
-                            Optional — pick one. It doesn't change what you get, it just
-                            means we're not wasting your time on the call.
-                          </p>
-                          <div className="space-y-2">
-                            {step2Points.map(item => {
-                              const isSelected = formData.painPoints.includes(item.label);
-                              return (
-                                <button key={item.slug} type="button"
-                                  onClick={() => {
-                                    setFormData(prev => {
-                                      // Single select — tapping the chosen one clears it.
-                                      const isOn = prev.painPoints.includes(item.label);
-                                      return {
-                                        ...prev,
-                                        painPoints:     isOn ? [] : [item.label],
-                                        specialistSlug: isOn ? '' : item.slug,
-                                      };
-                                    });
-                                  }}
-                                  className={`w-full p-4 rounded-xl border transition-all duration-200 flex items-start gap-3 text-left active:scale-[0.99] ${
-                                    isSelected
-                                      ? 'bg-accent-500/15 border-accent-500/40 text-white'
-                                      : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/[0.08] hover:border-white/20'
-                                  }`}
-                                >
-                                  {/* Round, not square — it's a pick-one now, and a
-                                      checkbox shape would still read as multi-select. */}
-                                  <div className={`mt-0.5 h-4 w-4 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${
-                                    isSelected ? 'bg-accent-500 text-white' : 'bg-white/10'
-                                  }`}>
-                                    {isSelected && <Check size={10} strokeWidth={3.5} />}
-                                  </div>
-                                  <div>
-                                    <div className="text-sm font-bold">{item.label}</div>
-                                    <div className="text-xs text-slate-600 mt-0.5">{item.desc}</div>
-                                  </div>
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      )}
+                          History: it began as a multi-select checklist deciding which
+                          automations you got. With the move to one plan it stopped
+                          gating anything, so on 30 July it became a single optional
+                          "what's costing you most time" pick, framed as helping us
+                          prioritise. Colin flagged it again on 3 August: if every
+                          client gets all ten regardless, asking them to click anything
+                          invites the question "what happens if I pick wrong?" — and
+                          there is no right answer, because it makes no difference.
+
+                          The justification for keeping one pick was that Aria could
+                          open with "you mentioned X on the form". That is not worth a
+                          confusing question on the page where someone decides whether
+                          to enquire at all — and Aria's rewritten call already asks
+                          them directly in Beat 2, which is better, because they answer
+                          in their own words instead of choosing from a list.
+
+                          The free-text "Anything else?" box below captures anything
+                          specific, without implying a choice that changes the product.
+
+                          NOTE: `painPoints` and `specialistSlug` are now always empty
+                          from this form. Downstream cost calculations were changed to
+                          derive from the trade's actual automation list — see
+                          server/ai/cost-calculator.js. They were previously computing
+                          from these labels, which never matched the calculator's keys
+                          anyway, so every pick silently scored a flat 1 hour with
+                          blank supporting text. */}
 
                       {/* Notes */}
                       <div className="space-y-1.5">
