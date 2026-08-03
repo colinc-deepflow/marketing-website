@@ -21,19 +21,28 @@ import { Container } from './ui/Shared';
  */
 
 const PLAN = {
-  monthly:   200,
-  annualMo:  167,   // 2 months free
+  monthly:   150,   // was 200 — revised 2026-08-03
+  annualMo:  125,   // 2 months free: (150 × 10) ÷ 12
   minTerm:   3,
 };
 
-// Founding-member rate — first 5 clients, locked for life.
-// Mirrors FOUNDING in command-centre/server/config/pricing.js.
-// When the 5 places are gone, set `show: false` — do NOT change the numbers,
-// since existing founding members keep this rate permanently.
+// ⚠️  THE PILOT RATE IS NOT PUBLIC AND MUST NOT BE SHOWN HERE.
+//
+// The first 5 clients pay £100/month locked for life, but they are hand-picked
+// test pilots — Colin selects them personally. It is an invitation, not a
+// first-come promotion, so advertising "first 5 businesses only" on a public
+// pricing page would be untrue: a visitor cannot claim one of those places by
+// signing up.
+//
+// This is deliberately left as `show: false` with no price. Do not re-enable it
+// to create urgency. If a genuinely public limited offer runs in future, add it
+// as a NEW constant rather than reusing this one — and update FOUNDING in
+// command-centre/server/config/pricing.js at the same time, since there is no
+// shared source between the marketing site and the app.
 const FOUNDING = {
-  show:     true,
-  monthly:  150,
-  places:   5,
+  show:     false,
+  monthly:  null,
+  places:   0,
 };
 
 const SOCIAL_ADDON = {
