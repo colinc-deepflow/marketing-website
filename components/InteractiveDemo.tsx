@@ -157,15 +157,17 @@ Cheers,
       },
       {
         icon: MessageSquare,
-        label: 'WhatsApp / SMS (Day −1)',
-        detail: '24hr reminder via customer\'s preferred channel, awaits confirmation',
+        // WhatsApp dropped entirely (#56) — the demo was showing a channel the
+        // product does not have, to people deciding whether to buy it.
+        label: 'Email reminder (Day −1)',
+        detail: '24hr reminder sent by email, awaits confirmation',
         iconColor: 'text-emerald-400',
         iconBg: 'bg-emerald-500/10',
       },
     ],
     output: {
       type: 'message',
-      channel: 'WhatsApp',
+      channel: 'Email',
       to: '[Customer Name]',
       fullBody: `Hi [Customer Name] 👋
 
@@ -241,7 +243,9 @@ Thanks,
     icon: Calendar,
     triggerIcon: Phone,
     trigger: 'Customer requests a site visit',
-    triggerDetail: 'Form submission · WhatsApp message · Availability check triggered',
+    // Was 'Form submission · WhatsApp message · Availability check triggered'.
+    // WhatsApp dropped (#56); enquiries arrive by web form or email.
+    triggerDetail: 'Form submission · Email enquiry · Availability check triggered',
     steps: [
       {
         icon: Calendar,

@@ -76,8 +76,21 @@ const ALSO_INCLUDED = [
   { name: 'Your own app',            desc: 'The portal installs to your phone home screen. Approve replies from the van.' },
   { name: 'AI assistant',            desc: 'Ask it anything about your jobs, quotes or who still owes you money.' },
   { name: 'Call me',                 desc: "Tap a button and the AI rings you with a rundown of what needs attention." },
-  { name: 'WhatsApp & email replies',desc: 'Customers message however they like. Every reply is drafted for you.' },
-  { name: 'Photo enquiries',         desc: 'A customer sends a photo of the problem — it becomes a job with a description.' },
+  // WhatsApp removed 2026-08-03 — the channel was dropped entirely (task #56),
+  // so advertising it here promised something the product cannot do.
+  { name: 'Email replies',           desc: 'Every customer email gets a reply drafted for you. Nothing sends until you approve it.' },
+  // 'Photo enquiries' REMOVED 2026-08-03. It was true when written — attachment
+  // handling exists, but only in clientWhatsappHandler.js, and WhatsApp was
+  // dropped entirely (#56). The inbound EMAIL webhook has no attachment
+  // handling at all, and an email carrying a phone photo bounces at 150KB
+  // (#88). So a customer photographing the problem does not become a job; it
+  // becomes a bounce the tradesperson never sees.
+  //
+  // Features.tsx had already been corrected for this reason (see its comment
+  // near PLATFORM_FEATURES) — this page was missed. Four true claims beat five
+  // with one that fails on a client's first week.
+  //
+  // Put it back when #88 (S3 attachments) and #125 land, not before.
 ];
 
 function TradeExtras() {
@@ -196,7 +209,10 @@ export const PricingPage: React.FC = () => (
               '5 more built for your trade',
               'Your own phone app',
               'AI assistant, 24/7',
-              'Email, WhatsApp & voice',
+              // Was 'Email, WhatsApp & voice'. WhatsApp was dropped (#56), so it
+              // must not appear in the headline feature list on the page where
+              // someone decides to buy.
+              'Email & voice',
               'You approve every message',
             ].map(item => (
               <div key={item} className="flex items-start gap-2.5">
