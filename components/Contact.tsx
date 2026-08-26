@@ -126,13 +126,18 @@ export const Contact: React.FC = () => {
   });
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  // Honeypot. Hidden from humans, irresistible to bots — see the field at the
+  // bottom of the form. A filled value is dropped server-side.
+  const [website, setWebsite] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError(null);
     try {
       const webhookUrl = import.meta.env.VITE_WEBHOOK_URL || 'http://localhost:5000/api/intake';
-      await fetch(webhookUrl, {
+      const res = await fetch(webhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -146,13 +151,24 @@ export const Contact: React.FC = () => {
           specialistSlug: formData.specialistSlug || null,
           notes: formData.notes,
           callConsent: formData.callConsent,
+          website, // honeypot
           submittedAt: new Date().toISOString(),
           source: 'website_contact_form',
         }),
       });
+
+      // ── Never fake success (fixed 2026-08-26) ─────────────────────────────
+      // This used to setSubmitted(true) in both the try and the catch, so a
+      // 400, a 500 or a dead network all showed "You're All Set!". The lead was
+      // gone and nobody — visitor or us — had any idea. If we cannot take the
+      // enquiry we have to say so, and give them a way to reach us anyway.
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        throw new Error(body?.error || 'We could not send that just now.');
+      }
       setSubmitted(true);
-    } catch {
-      setSubmitted(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'We could not send that just now.');
     } finally {
       setIsSubmitting(false);
     }
@@ -444,6 +460,33 @@ export const Contact: React.FC = () => {
                         </div>
                       </div>
 
+                      {/* Honeypot — off-screen, not tabbable, hidden from screen readers */}
+                      <div aria-hidden="true" className="absolute left-[-9999px] top-0 h-0 w-0 overflow-hidden">
+                        <label>
+                          Website
+                          <input
+                            type="text"
+                            tabIndex={-1}
+                            autoComplete="off"
+                            value={website}
+                            onChange={e => setWebsite(e.target.value)}
+                          />
+                        </label>
+                      </div>
+
+                      {error && (
+                        <div role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 p-4">
+                          <p className="text-sm font-bold text-red-300">{error}</p>
+                          <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                            Nothing was sent. Please try again, or email us at{' '}
+                            <a href="mailto:hello@deepflowai.co.uk" className="text-accent-400 underline">
+                              hello@deepflowai.co.uk
+                            </a>{' '}
+                            and we'll pick it up from there.
+                          </p>
+                        </div>
+                      )}
+
                       <div className="flex justify-between items-center pt-1">
                         <button type="button" onClick={() => setStep(1)}
                           className="text-slate-600 text-sm font-semibold hover:text-white transition-colors">
@@ -459,7 +502,7 @@ export const Contact: React.FC = () => {
                               Sending...
                             </>
                           ) : (
-                            "Show Me What It's Costing Me"
+                            error ? 'Try Again' : "Show Me What It's Costing Me"
                           )}
                         </Button>
                       </div>

@@ -9,25 +9,40 @@ export const ContactPage: React.FC = () => {
   const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  // Honeypot — hidden from humans, see the field near the submit button.
+  const [website, setWebsite] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    setError(null);
     try {
       const webhookUrl = import.meta.env.VITE_WEBHOOK_URL || 'http://localhost:5000/api/intake';
-      await fetch(webhookUrl, {
+      const res = await fetch(webhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
+          website, // honeypot
           submittedAt: new Date().toISOString(),
           source: 'general_enquiry',
         }),
       });
-    } catch {
-      // fail silently — show success regardless
-    } finally {
+
+      // ── Never fake success (fixed 2026-08-26) ─────────────────────────────
+      // The old version set submitted in `finally`, so every outcome — success,
+      // 400, 500, no network — showed "Message Sent!". Combined with the server
+      // silently discarding `message` at the time, a person could write to us,
+      // be told it had sent, and have nothing whatsoever reach anyone.
+      if (!res.ok) {
+        const body = await res.json().catch(() => null);
+        throw new Error(body?.error || 'We could not send that just now.');
+      }
       setSubmitted(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'We could not send that just now.');
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -130,6 +145,32 @@ export const ContactPage: React.FC = () => {
                   </div>
                 </div>
 
+                {/* Honeypot — off-screen, not tabbable, hidden from screen readers */}
+                <div aria-hidden="true" className="absolute left-[-9999px] top-0 h-0 w-0 overflow-hidden">
+                  <label>
+                    Website
+                    <input
+                      type="text"
+                      tabIndex={-1}
+                      autoComplete="off"
+                      value={website}
+                      onChange={e => setWebsite(e.target.value)}
+                    />
+                  </label>
+                </div>
+
+                {error && (
+                  <div role="alert" className="rounded-xl border border-red-500/30 bg-red-500/10 p-4">
+                    <p className="text-sm font-bold text-red-300">{error}</p>
+                    <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                      Nothing was sent. Please try again, or email us directly at{' '}
+                      <a href="mailto:hello@deepflowai.co.uk" className="text-accent-400 underline">
+                        hello@deepflowai.co.uk
+                      </a>.
+                    </p>
+                  </div>
+                )}
+
                 <div className="pt-2">
                   <Button
                     type="submit"
@@ -146,7 +187,7 @@ export const ContactPage: React.FC = () => {
                         </svg>
                         Sending...
                       </>
-                    ) : 'Send Message'}
+                    ) : error ? 'Try Again' : 'Send Message'}
                   </Button>
                 </div>
 
