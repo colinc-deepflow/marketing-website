@@ -1,0 +1,73 @@
+# ==============================================================================
+# Caddy site block — DeepflowAI trades marketing site
+#
+# ADD ONLY. Nothing here mentions florida2028.com, so appending this cannot
+# alter how Florida is served. Caddy matches on hostname: a request for
+# florida2028.com never reaches these blocks.
+#
+# Two ways to install it, depending on how Caddy runs on the VPS — the
+# deployment runbook (DEPLOYMENT.md) has a command that tells you which:
+#
+#   A) Caddy on the host  → append to /etc/caddy/Caddyfile, or drop this file in
+#                           /etc/caddy/conf.d/ if the main file has an `import`.
+#   B) Caddy in Docker    → append to the Caddyfile mounted into that container,
+#                           and swap the reverse_proxy target as noted below.
+#
+# Reload without dropping Florida's connections:
+#   caddy reload --config /etc/caddy/Caddyfile     (host)
+#   docker exec <caddy-container> caddy reload --config /etc/caddy/Caddyfile
+# ==============================================================================
+
+deepflowai-trades.co.uk, www.deepflowai-trades.co.uk {
+
+	# ── Where the app lives ───────────────────────────────────────────────────
+	# HOST CADDY: the compose file publishes the container on loopback only, so
+	# this is reachable from the host and from nowhere else.
+	reverse_proxy 127.0.0.1:8090
+
+	# DOCKERISED CADDY: a container cannot reach the host's 127.0.0.1. Comment
+	# out the line above, connect the Caddy container to the deepflow_net
+	# network, and use the service name instead:
+	#
+	#   docker network connect deepflow_net <caddy-container>
+	#   reverse_proxy deepflow-web:8080
+	#
+	# The compose file already creates deepflow_net for exactly this.
+
+	encode zstd gzip
+
+	# ── Security headers ──────────────────────────────────────────────────────
+	# HSTS belongs here, not in the app: Caddy terminates TLS, so it is the only
+	# thing that knows the connection was actually secure. One year, and
+	# subdomains included — only safe because every deepflowai-trades hostname is
+	# intended to be HTTPS-only.
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	# ── Logging ───────────────────────────────────────────────────────────────
+	# Its own file, so trades traffic never muddles Florida's logs and can be
+	# rotated or deleted independently.
+	log {
+		output file /var/log/caddy/deepflow-trades.log {
+			roll_size 10MB
+			roll_keep 5
+		}
+		format json
+	}
+
+	# The health route is for Docker and for you, not for search engines or
+	# passers-by. Keep it out of the public surface.
+	@health path /healthz
+	respond @health 404
+}
+
+# Caddy obtains and renews certificates for both names automatically on first
+# request, provided:
+#   · DNS for both already points at this VPS (it does), and
+#   · ports 80 and 443 are open to the world (they are — Florida uses them).
+# Nothing else is needed; do not run certbot.

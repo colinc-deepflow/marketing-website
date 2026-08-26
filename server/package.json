@@ -1,0 +1,16 @@
+{
+  "name": "deepflowai-website-server",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Production static server and AI proxy for the DeepflowAI trades site",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@google/genai": "^1.33.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

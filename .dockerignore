@@ -1,0 +1,26 @@
+# Keep the build context small and, more importantly, keep secrets out of it.
+# Anything listed here is never sent to the Docker daemon, so it cannot end up
+# in an image layer even by accident.
+
+.env
+.env.*
+!.env.example
+
+node_modules
+dist
+.git
+.gitignore
+.github
+
+*.log
+npm-debug.log*
+
+.vscode
+.idea
+.claude
+.DS_Store
+Thumbs.db
+
+# Docs and local-only files that have no place in an image
+*.md
+!README.md

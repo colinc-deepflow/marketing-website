@@ -1,26 +1,56 @@
+/**
+ * Workflow preview — client side.
+ *
+ * This used to call Gemini directly from the browser, with the API key
+ * substituted into the bundle by vite.config.ts. That published the key: the
+ * bundle is a public file, so anyone could read it and spend the quota.
+ *
+ * The call now goes to our own server, which holds the key and never sends it
+ * to the browser. See server/index.js.
+ */
 
-import { GoogleGenAI } from "@google/genai";
+export interface WorkflowPreviewResult {
+  ok: boolean;
+  text: string;
+}
 
 export const generateWorkflowPreview = async (scenario: string): Promise<string> => {
-  // Fixed: Following guidelines to assume process.env.API_KEY is pre-configured and accessible.
-  // Fixed: Using gemini-3-pro-preview for complex text tasks (automated reasoning and workflow design).
+  const result = await requestWorkflowPreview(scenario);
+  return result.text;
+};
+
+export const requestWorkflowPreview = async (
+  scenario: string
+): Promise<WorkflowPreviewResult> => {
+  const trimmed = (scenario || '').trim();
+  if (!trimmed) {
+    return { ok: false, text: 'Describe the scenario first and we\'ll map it out.' };
+  }
+
   try {
-    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-    
-    const response = await ai.models.generateContent({
-      model: 'gemini-3-pro-preview',
-      contents: `You are DeepflowAI, an automation engine for joiners and fitters. 
-      The user (a joiner) has input this scenario: "${scenario}".
-      
-      Output a 3-step automated workflow that would handle this. 
-      Then, draft a short, professional, plain-text email that the system would prepare for the joiner to review and send.
-      Keep it practical, no fluff, "engineered" tone.
-      Format with Markdown bullet points and bold headings.`,
+    const res = await fetch('/api/ai/workflow-preview', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ scenario: trimmed.slice(0, 1000) }),
     });
 
-    return response.text || "System could not generate a preview at this time.";
-  } catch (error) {
-    console.error("Gemini API Error:", error);
-    return "Error generating preview. Please ensure the system is properly configured and try again.";
+    // Distinguish the cases that mean different things to a visitor, rather
+    // than collapsing everything into one unhelpful "error" string.
+    if (res.status === 503) {
+      return { ok: false, text: 'The live preview isn\'t switched on at the moment.' };
+    }
+    if (res.status === 429) {
+      return { ok: false, text: 'You\'ve run a few of these already — give it a minute and try again.' };
+    }
+    if (!res.ok) {
+      const body = await res.json().catch(() => null);
+      return { ok: false, text: (body && body.error) || 'Couldn\'t generate that preview just now.' };
+    }
+
+    const body = await res.json();
+    return { ok: true, text: body.text || 'No preview came back — try rewording the scenario.' };
+  } catch {
+    // Network-level failure: offline, DNS, server unreachable.
+    return { ok: false, text: 'Couldn\'t reach the preview service. Check your connection and try again.' };
   }
 };

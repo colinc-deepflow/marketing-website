@@ -1,0 +1,88 @@
+# ==============================================================================
+# DeepflowAI trades marketing site
+#
+# Runs as an INDEPENDENT stack, separate from the Florida application. It has
+# its own project name, its own network and its own port, and it declares no
+# dependency on anything Florida owns. Bringing this up or down cannot affect it.
+#
+#   docker compose -p deepflow up -d --build
+#   docker compose -p deepflow down
+#
+# The published port is bound to 127.0.0.1 on purpose: the container is reachable
+# from Caddy on the host, and from nowhere else on the internet. All public
+# traffic arrives through Caddy, which terminates TLS.
+# ==============================================================================
+
+name: deepflow
+
+services:
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        # Public URL, baked into the browser bundle at build time. Change it and
+        # you must rebuild — it is not a runtime setting.
+        VITE_WEBHOOK_URL: ${VITE_WEBHOOK_URL:?VITE_WEBHOOK_URL must be set in .env}
+    image: deepflow-web:latest
+    container_name: deepflow-web
+
+    # Restart on failure and after a host reboot, but not if it was stopped
+    # deliberately — that distinction matters during a rollback.
+    restart: unless-stopped
+
+    environment:
+      NODE_ENV: production
+      PORT: 8080
+      # Read at runtime, never sent to the browser. Leave unset to run the site
+      # with the AI demo cleanly disabled (it returns an honest 503).
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini-2.5-flash}
+      AI_DEMO_ENABLED: ${AI_DEMO_ENABLED:-true}
+      AI_RATE_LIMIT_MAX: ${AI_RATE_LIMIT_MAX:-10}
+
+    ports:
+      # host:container — loopback only. Caddy proxies to 127.0.0.1:8090.
+      - "127.0.0.1:${DEEPFLOW_HOST_PORT:-8090}:8080"
+
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://127.0.0.1:8080/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+    # ── Hardening ─────────────────────────────────────────────────────────────
+    # The app serves a pre-built directory and holds no state, so nothing needs
+    # to be writable. No volumes are declared for the same reason: there is no
+    # persistent data to keep, and inventing one would only be somewhere for a
+    # compromise to hide.
+    read_only: true
+    tmpfs:
+      - /tmp:size=16m,mode=1777
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+    # Bounded so a runaway process cannot starve the Florida containers sharing
+    # this VPS. Generous for a static site with a small proxy.
+    deploy:
+      resources:
+        limits:
+          cpus: "0.75"
+          memory: 384M
+
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "5"
+
+    networks:
+      - deepflow
+
+networks:
+  deepflow:
+    name: deepflow_net
+    driver: bridge
