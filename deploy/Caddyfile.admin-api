@@ -1,0 +1,91 @@
+# ==============================================================================
+# Caddy site block — command-centre API (admin.deepflowai.co.uk)
+#
+# WHY THIS IS HERE, in the marketing-website repo:
+# the trades site's enquiry forms POST to https://admin.deepflowai.co.uk/api/intake.
+# That hostname already resolves to this VPS but has never been added to Caddy,
+# so it has no certificate and every submission fails. Route the site without
+# routing this and you get a site that loads perfectly and cannot take an
+# enquiry. The two changes belong together.
+#
+# The API itself is a SEPARATE application:
+#   https://github.com/colinc-deepflow/command-centre  (server/, Node under PM2)
+# This file only tells Caddy where to find it.
+#
+# ADD ONLY. Nothing here mentions florida2028.com.
+#
+# ── CONFIRM THE PORT BEFORE USING THIS ───────────────────────────────────────
+# 5000 comes from ecosystem.config.js (the dashboard-api PM2 app). Verify what
+# is actually listening before you reload Caddy:
+#
+#   pm2 list
+#   sudo ss -tlnp | grep 5000
+#   curl -s http://127.0.0.1:5000/api/health
+#
+# If nothing answers, the API is not running on this VPS — routing to it would
+# just produce a 502. Sort that out first; the block below is correct either
+# way, but pointless until something is listening.
+# ==============================================================================
+
+admin.deepflowai.co.uk {
+
+	# HOST CADDY: the Node app listens on the host.
+	reverse_proxy 127.0.0.1:5000 {
+		# The app reads X-Forwarded-For for its rate limiting, and sets
+		# `app.set('trust proxy', 1)` in production — so exactly one hop must be
+		# in front of it. Caddy adds these by default; they are spelled out here
+		# because the intake limiter's correctness depends on them.
+		header_up X-Real-IP {remote_host}
+	}
+
+	# DOCKERISED CADDY: a container cannot reach the host's loopback. Use the
+	# host gateway instead of 127.0.0.1:
+	#
+	#   reverse_proxy host.docker.internal:5000
+	#
+	# and start the Caddy container with:
+	#   --add-host host.docker.internal:host-gateway
+	# (or the equivalent extra_hosts entry in its compose file).
+
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		X-Content-Type-Options "nosniff"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		-Server
+	}
+
+	# ── CORS is handled by the APP, not here ─────────────────────────────────
+	# Deliberately no CORS handling in this block. Answering the preflight in
+	# Caddy would need the full set of Access-Control-* headers echoed back
+	# correctly; get one wrong and the browser blocks the request with an error
+	# that looks like a server fault. The app already implements this properly
+	# (middleware/security.js, corsMiddleware) — Caddy just passes it through.
+	#
+	# ⚠️  ACTION REQUIRED ON THE API SERVER, or the forms will still fail.
+	# The app's CORS allowlist comes from ALLOWED_ORIGINS in command-centre's
+	# server/.env, and today that variable is NOT SET — so it falls back to
+	# ['http://localhost:3000', 'http://localhost:5173', 'http://127.0.0.1:5173'].
+	# A browser on https://deepflowai-trades.co.uk is not on that list, its
+	# preflight is refused, and the enquiry never leaves the page.
+	#
+	# Add to command-centre/server/.env and restart the API:
+	#   ALLOWED_ORIGINS=https://deepflowai-trades.co.uk,https://www.deepflowai-trades.co.uk
+	#
+	# Verify from a machine other than the server:
+	#   curl -si -X OPTIONS https://admin.deepflowai.co.uk/api/intake \
+	#     -H 'Origin: https://deepflowai-trades.co.uk' \
+	#     -H 'Access-Control-Request-Method: POST' \
+	#     -H 'Access-Control-Request-Headers: content-type' \
+	#     | grep -i access-control
+	# You want to see access-control-allow-origin echoing the trades domain.
+
+	log {
+		output file /var/log/caddy/admin-api.log {
+			roll_size 10MB
+			roll_keep 5
+		}
+		format json
+	}
+}
