@@ -3,125 +3,128 @@ import { Check, ChevronDown, ChevronUp } from 'lucide-react';
 import { Container } from './ui/Shared';
 
 /**
- * Pricing — single plan, everything included.
+ * Pricing — rewritten 11 Oct 2026.
  *
- * Rewritten 2026-07-27, replacing the Starter/Core/Trade Pro ladder.
+ * £69/month + £100 one-off setup for the DeepFlow plan, monthly, cancel
+ * anytime (Colin, 11 Oct 2026). Custom / specialist work is quoted per job.
+ * The old £150 plan, the annual £125 option, the £99 Social add-on and the
+ * "5 trade-specific automations" are all gone — the trade automations were
+ * switched off on 20 Sept 2026 and must not be sold.
  *
- * Why: tradespeople buy solutions to problems, not feature counts. Gating an
- * automation only earns money if the buyer already understands and wants it —
- * and someone who's never heard of an AI voice agent won't pay more to unlock
- * one. Worse, every automation a client actually uses makes them less likely
- * to cancel, so gating suppressed usage and increased churn. For a
- * subscription business churn costs more than lost upsell.
- *
- * NOTE: these figures must stay in step with
- * command-centre/server/config/pricing.js, which feeds Aria, the proposal
- * generator and the sales emails. There is no shared source between the
- * marketing site and the app — change both together.
+ * The same numbers live in command-centre/server/config/pricing.js (used by
+ * the sales emails and the phone agent). There is no shared source — change
+ * both together.
  */
 
 const PLAN = {
-  monthly:   150,   // was 200 — revised 2026-08-03
-  annualMo:  125,   // 2 months free: (150 × 10) ÷ 12
-  minTerm:   3,
+  monthly: 69,
+  setup: 100,
 };
 
-// ⚠️  THE PILOT RATE IS NOT PUBLIC AND MUST NOT BE SHOWN HERE.
-//
-// The first 5 clients pay £100/month locked for life, but they are hand-picked
-// test pilots — Colin selects them personally. It is an invitation, not a
-// first-come promotion, so advertising "first 5 businesses only" on a public
-// pricing page would be untrue: a visitor cannot claim one of those places by
-// signing up.
-//
-// This is deliberately left as `show: false` with no price. Do not re-enable it
-// to create urgency. If a genuinely public limited offer runs in future, add it
-// as a NEW constant rather than reusing this one — and update FOUNDING in
-// command-centre/server/config/pricing.js at the same time, since there is no
-// shared source between the marketing site and the app.
-const FOUNDING = {
-  show:     false,
-  monthly:  null,
-  places:   0,
-};
-
-const SOCIAL_ADDON = {
-  monthly:  99,
-  annualMo: 83,
-};
-
-// ── The 5 core automations, included for everyone ─────────────────────────────
-const CORE_FIVE = [
-  { name: 'Lead follow-up',       desc: 'Responds to every new enquiry automatically — within minutes, not hours.' },
-  { name: 'Quote reminder',       desc: 'Chases unanswered quotes so you stop losing jobs to competitors who followed up.' },
-  { name: 'Invoice chaser',       desc: 'Professionally escalating payment reminders at 7, 14 and 30 days. No awkward calls.' },
-  { name: 'Appointment reminder', desc: 'Sends 48-hour and 2-hour reminders before every job. No-shows drop off fast.' },
-  { name: 'Review request',       desc: 'Asks for a Google review 24 hours after every completed job, at the perfect moment.' },
+const GROUPS = [
+  {
+    title: 'Enquiries',
+    items: [
+      'Your own enquiry page for Facebook, your van and your emails',
+      'A reply written within seconds of someone getting in touch',
+      'Phone enquiries logged in 20 seconds, reply written for you',
+    ],
+  },
+  {
+    title: 'Quotes',
+    items: [
+      'Quote email written from the price you put on the job',
+      'Quiet quotes followed up — then you\'re told when to ring',
+      'See which jobs you win and lose, and why',
+    ],
+  },
+  {
+    title: 'Bookings',
+    items: [
+      'Booking confirmation and reminders before you arrive',
+      'Start and finish notes to the customer',
+      'How long a customer took to pay last time, before you quote them',
+    ],
+  },
+  {
+    title: 'Getting paid',
+    items: [
+      'Invoice email written when you finish, with your bank details',
+      'Every £ and your bank details checked before it goes',
+      'Polite reminders at 7, 14, 30 and 45 days',
+    ],
+  },
+  {
+    title: 'After the job',
+    items: [
+      'Review request with your Google, Checkatrade or Trustpilot link',
+      'A friendly note eleven months later to bring them back',
+    ],
+  },
+  {
+    title: 'Your AI PA',
+    items: [
+      'Ask it anything about your jobs, customers and money',
+      'Call Me — it rings you, you update jobs by talking',
+      'Optional 5pm call on weekdays to clear the day',
+    ],
+  },
+  {
+    title: 'Keeping watch',
+    items: [
+      'Reads customer replies and writes your answer',
+      'Every message watched for a reply, quiet ones followed up',
+      'A text every Friday at 5pm with your week in numbers',
+    ],
+  },
+  {
+    title: 'One-tap messages',
+    items: [
+      'Emergency reply, no-show rebook, referral ask',
+      'Warranty check-in, cert reminder, big-quote follow-up',
+    ],
+  },
 ];
 
-// ── Trade-specific extras — also included ─────────────────────────────────────
-const TRADE_EXTRAS: Record<string, string[]> = {
-  'Plumber':           ['Emergency callout response', 'No-show follow-up', 'Annual landlord check reminder', 'New enquiry SMS alert', 'Lapsed customer win-back'],
-  'Gas Engineer':      ['Emergency callout response', 'Annual boiler service reminder', 'Pre-winter seasonal outreach', 'Insurance/membership renewal alert', 'Gas Safe renewal reminder'],
-  'Electrician':       ['Emergency callout response', 'Big job nurture (rewires/EV chargers)', 'NICEIC/NAPIT renewal reminder', 'Insurance/membership renewal alert', 'New enquiry SMS alert'],
-  'Builder':           ['Big job nurture (extensions)', 'No-show follow-up', 'Guarantee check-in', 'Lapsed customer win-back', 'Weekly timesheet chaser'],
-  'Roofer':            ['Pre-winter seasonal outreach', 'Big quote nurture', 'Emergency callout response', 'No-show follow-up', 'Guarantee check-in'],
-  'Joiner':            ['Big job nurture', 'Guarantee check-in', 'Referral trigger', 'Lapsed customer win-back', 'Silent customer alert'],
-  'Painter/Decorator': ['Spring/Christmas seasonal outreach', 'Big job nurture', 'Referral trigger', 'Lapsed customer win-back', 'Silent customer alert'],
-  'Landscaper':        ['Spring booking rush outreach', 'Annual maintenance reminder', 'Big project nurture', 'Referral trigger', 'Lapsed customer win-back'],
-};
-
-// ── Everything else in the plan ───────────────────────────────────────────────
-const ALSO_INCLUDED = [
-  { name: 'Your own app',            desc: 'The portal installs to your phone home screen. Approve replies from the van.' },
-  { name: 'AI assistant',            desc: 'Ask it anything about your jobs, quotes or who still owes you money.' },
-  { name: 'Call me',                 desc: "Tap a button and the AI rings you with a rundown of what needs attention." },
-  // WhatsApp removed 2026-08-03 — the channel was dropped entirely (task #56),
-  // so advertising it here promised something the product cannot do.
-  { name: 'Email replies',           desc: 'Every customer email gets a reply drafted for you. Nothing sends until you approve it.' },
-  // 'Photo enquiries' REMOVED 2026-08-03. It was true when written — attachment
-  // handling exists, but only in clientWhatsappHandler.js, and WhatsApp was
-  // dropped entirely (#56). The inbound EMAIL webhook has no attachment
-  // handling at all, and an email carrying a phone photo bounces at 150KB
-  // (#88). So a customer photographing the problem does not become a job; it
-  // becomes a bounce the tradesperson never sees.
-  //
-  // Features.tsx had already been corrected for this reason (see its comment
-  // near PLATFORM_FEATURES) — this page was missed. Four true claims beat five
-  // with one that fails on a client's first week.
-  //
-  // Put it back when #88 (S3 attachments) and #125 land, not before.
+const FAQ = [
+  {
+    q: 'Do I need to be good with computers?',
+    a: 'No. We set it all up for you. Day to day it\'s an app on your phone: read a message, tap approve. Or tap Call Me and just talk.',
+  },
+  {
+    q: 'Will it send anything without me knowing?',
+    a: 'Never. Every message to a customer waits for you to read it and tick a box. If you change the message after ticking, the tick clears. It never phones your customers.',
+  },
+  {
+    q: 'What does the £100 setup cover?',
+    a: 'We go through your business with you and set everything up: your details, bank details for invoices, your review links, and how your messages should sound — so they read like you wrote them.',
+  },
+  {
+    q: 'Is there a contract?',
+    a: 'No. It\'s monthly. Stop whenever you like.',
+  },
+  {
+    q: 'Does it replace my accounts software?',
+    a: 'No. Keep your accounts package, your diary and your bank. DeepFlow handles the talking — the replies, the chasing and the reminders.',
+  },
+  {
+    q: 'What if my problem isn\'t on the list?',
+    a: 'That\'s what custom work is for. Tell us the job, send us a photo of the paperwork, and we\'ll show you the fix and the price before we start.',
+  },
 ];
 
-function TradeExtras() {
-  const [open, setOpen] = useState<string | null>(null);
+function FaqItem({ q, a }: { q: string; a: string }) {
+  const [open, setOpen] = useState(false);
   return (
-    <div className="space-y-2">
-      {Object.entries(TRADE_EXTRAS).map(([trade, extras]) => (
-        <div key={trade} className="border border-white/10 rounded-xl overflow-hidden">
-          <button
-            onClick={() => setOpen(open === trade ? null : trade)}
-            className="w-full flex items-center justify-between px-5 py-3.5 text-left text-sm text-slate-300 hover:text-white hover:bg-white/4 transition-colors"
-          >
-            <span className="font-medium">{trade}</span>
-            {open === trade
-              ? <ChevronUp className="w-4 h-4 text-slate-500" />
-              : <ChevronDown className="w-4 h-4 text-slate-500" />}
-          </button>
-          {open === trade && (
-            <div className="px-5 pb-4 bg-slate-900/40">
-              <ul className="space-y-1.5 pt-1">
-                {extras.map((e, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-slate-400">
-                    <span className="text-accent-500 mt-0.5 flex-shrink-0">›</span>
-                    {e}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      ))}
+    <div className="border border-white/10 rounded-xl overflow-hidden">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left text-sm text-slate-200 font-semibold hover:bg-white/[0.04] transition-colors"
+      >
+        <span>{q}</span>
+        {open ? <ChevronUp className="w-4 h-4 text-slate-500 flex-shrink-0" /> : <ChevronDown className="w-4 h-4 text-slate-500 flex-shrink-0" />}
+      </button>
+      {open && <p className="px-5 pb-4 text-sm text-slate-400 leading-relaxed">{a}</p>}
     </div>
   );
 }
@@ -138,14 +141,13 @@ export const PricingPage: React.FC = () => (
         <div className="mb-14">
           <div className="h-px w-14 bg-gradient-to-r from-accent-500 to-blue-500 mb-8" />
           <h1 className="text-5xl md:text-6xl font-extrabold text-white tracking-tight mb-6 leading-[1.1]">
-            One price.<br className="hidden sm:block" /> Everything included.
+            Less than a night<br className="hidden sm:block" /> out a month.
           </h1>
           <p className="text-xl text-slate-300 font-light mb-4 leading-relaxed">
-            No packages to compare, no features held back, no upgrade nudges.
-            You get every automation we build — including the ones made specifically for your trade.
+            One plan. Everything in it. No contract.
           </p>
           <p className="text-slate-400 leading-relaxed">
-            We set it all up, we keep it running, and nothing is ever sent to a customer without you approving it first.
+            We set it up, we keep it running, and nothing is ever sent to a customer without you approving it first.
           </p>
         </div>
 
@@ -153,171 +155,90 @@ export const PricingPage: React.FC = () => (
         <div className="rounded-2xl p-8 md:p-10 border bg-accent-500/8 border-accent-500/30 mb-6">
           <div className="flex flex-wrap items-start justify-between gap-6 mb-6">
             <div>
-              <h2 className="text-2xl font-extrabold text-white mb-1">DeepflowAI</h2>
-              <p className="text-slate-400 text-sm">Your whole customer admin, handled.</p>
+              <h2 className="text-2xl font-extrabold text-white mb-1">The DeepFlow plan</h2>
+              <p className="text-slate-400 text-sm">Your enquiries, quotes, invoices and chasing — handled.</p>
             </div>
             <div className="text-right shrink-0">
-              {FOUNDING.show ? (
-                <>
-                  <div className="flex items-baseline justify-end gap-2">
-                    <span className="text-xl font-semibold text-slate-500 line-through">£{PLAN.monthly}</span>
-                    <span className="text-4xl font-extrabold text-white">£{FOUNDING.monthly}</span>
-                    <span className="text-slate-500 text-sm">/ month</span>
-                  </div>
-                  <p className="text-amber-400 text-xs mt-1 font-semibold">
-                    Founding rate — first {FOUNDING.places} businesses only
-                  </p>
-                </>
-              ) : (
-                <>
-                  <div>
-                    <span className="text-4xl font-extrabold text-white">£{PLAN.monthly}</span>
-                    <span className="text-slate-500 text-sm"> / month</span>
-                  </div>
-                  <p className="text-emerald-500 text-xs mt-1">£{PLAN.annualMo}/mo paid annually</p>
-                </>
-              )}
+              <div>
+                <span className="text-5xl font-extrabold text-white">£{PLAN.monthly}</span>
+                <span className="text-slate-500 text-sm"> / month</span>
+              </div>
+              <p className="text-slate-400 text-xs mt-1">+ £{PLAN.setup} one-off setup</p>
             </div>
           </div>
 
-          {FOUNDING.show && (
-            <div className="rounded-xl bg-amber-500/8 border border-amber-500/25 px-5 py-4 mb-6">
-              <p className="text-sm text-amber-200/90 leading-relaxed">
-                <strong className="text-amber-300">We're taking on our first {FOUNDING.places} businesses at £{FOUNDING.monthly} a month — locked for life.</strong>{' '}
-                Not an introductory offer that jumps up later. That price is yours for as long as you stay,
-                even when it goes to £{PLAN.monthly} for everyone else.
-              </p>
-              <p className="text-xs text-amber-200/60 mt-2 leading-relaxed">
-                Why: we're new, and we'd rather have five businesses who'll tell us honestly what's working
-                than fifty who quietly drift off. All we ask is your feedback — and if it earns it, a few
-                words we can quote.
-              </p>
-            </div>
-          )}
-
-          <div className="flex flex-wrap gap-2 mb-6">
-            {['No setup fee', 'No long contract', `${PLAN.minTerm}-month minimum`, 'Cancel anytime after'].map(t => (
+          <div className="flex flex-wrap gap-2 mb-8">
+            {['Monthly — cancel anytime', 'Set up for you', 'Works on your phone', 'You approve every message'].map(t => (
               <span key={t} className="text-xs font-semibold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-3 py-1.5 rounded-full">
                 {t}
               </span>
             ))}
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-x-8 gap-y-3">
-            {[
-              'All 5 core automations',
-              '5 more built for your trade',
-              'Your own phone app',
-              'AI assistant, 24/7',
-              // Was 'Email, WhatsApp & voice'. WhatsApp was dropped (#56), so it
-              // must not appear in the headline feature list on the page where
-              // someone decides to buy.
-              'Email & voice',
-              'You approve every message',
-            ].map(item => (
-              <div key={item} className="flex items-start gap-2.5">
-                <div className="w-5 h-5 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Check className="w-3 h-3 text-emerald-400" />
-                </div>
-                <span className="text-sm text-slate-300">{item}</span>
+          <div className="grid sm:grid-cols-2 gap-x-8 gap-y-6">
+            {GROUPS.map(g => (
+              <div key={g.title}>
+                <p className="text-white font-bold text-sm mb-2">{g.title}</p>
+                <ul className="space-y-2">
+                  {g.items.map(item => (
+                    <li key={item} className="flex items-start gap-2.5">
+                      <div className="w-4 h-4 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center flex-shrink-0 mt-0.5">
+                        <Check className="w-2.5 h-2.5 text-emerald-400" />
+                      </div>
+                      <span className="text-sm text-slate-300 leading-snug">{item}</span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             ))}
           </div>
-        </div>
 
-        {/* Optional add-on */}
-        <div className="rounded-2xl p-8 border bg-slate-900/60 border-white/10 mb-10">
-          <div className="flex flex-wrap items-start justify-between gap-4 mb-3">
-            <div>
-              <div className="flex items-center gap-3 mb-1">
-                <h2 className="text-lg font-bold text-white">Social Content</h2>
-                <span className="text-xs font-bold text-slate-400 bg-slate-800/60 border border-white/8 px-2.5 py-0.5 rounded-full">
-                  Optional
-                </span>
-              </div>
-              <p className="text-slate-500 text-xs">A separate service, if you want it</p>
-            </div>
-            <div className="text-right shrink-0">
-              <div>
-                <span className="text-2xl font-extrabold text-white">£{SOCIAL_ADDON.monthly}</span>
-                <span className="text-slate-500 text-sm"> / month</span>
-              </div>
-              <p className="text-emerald-500 text-xs mt-0.5">£{SOCIAL_ADDON.annualMo}/mo paid annually</p>
-            </div>
-          </div>
-          <p className="text-sm text-slate-400 leading-relaxed">
-            Done-for-you social posts and images, written and produced every month, ready for you to approve and post.
-            This is the one thing that isn't in the main plan — it's a separate piece of work, not a locked feature.
-          </p>
+          <a href="/#assessment" className="mt-8 inline-flex items-center justify-center w-full h-14 rounded-xl text-base font-bold bg-accent-500 hover:bg-accent-400 text-slate-950 transition-all">
+            Get started
+          </a>
         </div>
 
         {/* Worth-it framing */}
-        <div className="bg-emerald-500/8 border border-emerald-500/20 rounded-2xl px-8 py-5 mb-10">
+        <div className="bg-emerald-500/8 border border-emerald-500/20 rounded-2xl px-8 py-5 mb-6">
           <p className="text-slate-300 text-sm leading-relaxed">
-            <strong className="text-emerald-400">Work out your own number.</strong>{' '}
-            Take the hours you lose each week to chasing quotes, writing invoices and reminding people about
-            appointments, and multiply by what an hour of your time is worth. For most trades, one recovered
-            hour a week already covers the <strong className="text-white">£{FOUNDING.show ? FOUNDING.monthly : PLAN.monthly}</strong> — and one job
-            won back from a quote that would otherwise have gone cold covers several months.
+            <strong className="text-emerald-400">Is it worth it?</strong>{' '}
+            £{PLAN.monthly} is about two hours of your time a month. If it wins you back one job that
+            would have gone cold, or gets one late invoice paid weeks sooner, it has paid for itself many times over.
           </p>
         </div>
 
-        {/* Core five */}
-        <div className="bg-slate-900/60 border border-white/10 rounded-2xl p-8 mb-5">
-          <p className="text-white font-bold text-base mb-1">The 5 core automations</p>
-          <p className="text-slate-500 text-xs mb-6">Every client gets all five. No picking, no tiers.</p>
-          <ul className="space-y-5">
-            {CORE_FIVE.map((a, i) => (
-              <li key={i} className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Check className="w-3.5 h-3.5 text-emerald-400" />
-                </div>
-                <div>
-                  <p className="text-slate-200 text-sm font-semibold">{a.name}</p>
-                  <p className="text-slate-500 text-xs mt-0.5 leading-relaxed">{a.desc}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        {/* Trade extras */}
-        <div className="bg-slate-900/60 border border-white/10 rounded-2xl p-8 mb-5">
-          <p className="text-white font-bold text-base mb-1">Plus 5 built for your trade</p>
-          <p className="text-slate-500 text-xs mb-5">
-            Included as standard. Pick your trade to see exactly what you'd get.
+        {/* Custom */}
+        <div className="rounded-2xl p-8 md:p-10 border bg-slate-900/60 border-white/10 mb-10">
+          <div className="flex flex-wrap items-start justify-between gap-4 mb-4">
+            <div>
+              <h2 className="text-xl font-bold text-white mb-1">Custom work</h2>
+              <p className="text-slate-500 text-sm">For the job no app can fix</p>
+            </div>
+            <div className="text-right shrink-0">
+              <span className="text-xl font-extrabold text-white">Priced per job</span>
+              <p className="text-slate-500 text-xs mt-1">You know the price before we start</p>
+            </div>
+          </div>
+          <p className="text-sm text-slate-400 leading-relaxed mb-4">
+            Job cards from a contractor, a spreadsheet you fill in every month, a portal you type everything into twice,
+            supplier invoices, bank statements for your accountant, social media posts. Tell us the job and send us
+            a photo of the paperwork. We'll show you the fix and the price.
           </p>
-          <TradeExtras />
-        </div>
-
-        {/* Also included */}
-        <div className="bg-slate-900/60 border border-white/10 rounded-2xl p-8 mb-5">
-          <p className="text-white font-bold text-base mb-1">And everything else</p>
-          <p className="text-slate-500 text-xs mb-6">Not extras. Just part of it.</p>
-          <ul className="space-y-5">
-            {ALSO_INCLUDED.map((a, i) => (
-              <li key={i} className="flex items-start gap-3">
-                <div className="w-6 h-6 rounded-full bg-accent-500/15 border border-accent-500/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Check className="w-3.5 h-3.5 text-accent-400" />
-                </div>
-                <div>
-                  <p className="text-slate-200 text-sm font-semibold">{a.name}</p>
-                  <p className="text-slate-500 text-xs mt-0.5 leading-relaxed">{a.desc}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
+          <p className="text-sm text-slate-300 leading-relaxed">
+            <strong className="text-white">Real example:</strong> we built D&M Fixing &amp; Joinery a system that takes
+            contractor job cards all the way to invoices and the month-end spreadsheet. It gives Robert about an hour and a half back every night.
+          </p>
         </div>
 
         {/* How it works */}
-        <div className="bg-slate-900/40 border border-white/8 rounded-2xl p-8 mb-5">
-          <p className="text-white font-bold text-base mb-5">How it works</p>
+        <div className="bg-slate-900/40 border border-white/8 rounded-2xl p-8 mb-10">
+          <p className="text-white font-bold text-base mb-5">How getting started works</p>
           <div className="space-y-4">
             {[
-              { step: '1', title: 'Fill in the form', desc: "Takes 2 minutes. Tell us your trade and what's slowing you down." },
-              { step: '2', title: 'We build it for you', desc: 'No software to learn, no setup on your end. Everything is ready in 2–3 days.' },
-              { step: '3', title: 'It runs in the background', desc: "Automations fire when they're supposed to. You approve, they send." },
-              { step: '4', title: 'You stay in control', desc: 'Nothing reaches a customer until you have seen it and said yes.' },
+              { step: '1', title: 'Fill in the form', desc: 'A couple of minutes. Tell us your trade and what\'s eating your time.' },
+              { step: '2', title: 'We have a quick chat', desc: 'We go through how you work and answer anything you want to know.' },
+              { step: '3', title: 'We set it up for you', desc: 'Your details, bank details, review links and how your messages should sound. Nothing for you to install.' },
+              { step: '4', title: 'You tap OK, it does the rest', desc: 'Messages are written for you. You read, approve, and get on with the job.' },
             ].map((s) => (
               <div key={s.step} className="flex items-start gap-4">
                 <div className="w-7 h-7 rounded-full bg-accent-500/15 border border-accent-500/30 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -332,19 +253,12 @@ export const PricingPage: React.FC = () => (
           </div>
         </div>
 
-        {/* Custom */}
-        <div className="bg-slate-900/40 border border-white/8 rounded-2xl px-8 py-6">
-          <p className="text-white font-bold text-base mb-2">Need something different?</p>
-          <p className="text-slate-400 text-sm leading-relaxed mb-3">
-            Larger teams, unusual setups, or custom integrations — we can build it.
-            Get in touch and we'll put together a quote.
-          </p>
-          <a
-            href="#assessment"
-            className="text-accent-400 hover:text-accent-300 underline text-sm font-semibold transition-colors"
-          >
-            Get a free assessment →
-          </a>
+        {/* FAQ */}
+        <div>
+          <p className="text-white font-bold text-lg mb-4">Questions people ask</p>
+          <div className="space-y-2">
+            {FAQ.map(f => <FaqItem key={f.q} {...f} />)}
+          </div>
         </div>
 
       </div>

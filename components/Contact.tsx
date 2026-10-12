@@ -16,6 +16,8 @@ interface FormData {
   painPoints: string[];
   specialistSlug: string;
   notes: string;
+  software: string[];
+  softwareOther: string;
   callConsent: boolean;
 }
 
@@ -46,13 +48,13 @@ const TRADE_PAIN_POINTS: Record<string, { slug: string; label: string; desc: str
     { slug: 'emergency-callout-response',     label: 'Emergency customers not hearing back',  desc: 'They call three numbers in five minutes — first to respond wins' },
     { slug: 'big-quote-nurture',              label: 'Big jobs (rewires, EV chargers) going cold', desc: 'High-value quotes need more chasing than a standard job' },
     { slug: 'insurance-membership-renewal',   label: 'Insurance or membership expiring',      desc: 'PL insurance, NICEIC fee — easy to miss until it\'s too late' },
-    { slug: 'new-enquiry-sms',                label: 'Missing enquiries while on site',        desc: '78% of jobs go to whoever responds first — you need an instant alert' },
+    { slug: 'new-enquiry-sms',                label: 'Missing enquiries while on site',        desc: 'They ring the next number if you don\'t answer — and you can\'t answer from a roof' },
   ],
   'plumber': [
     { slug: 'emergency-callout-response',     label: 'Emergency customers not hearing back',  desc: 'They call three numbers in five minutes — first to respond wins' },
     { slug: 'no-show-follow-up',              label: 'No-shows wasting a full day',            desc: 'Drove out, no one answered — an automated follow-up gets them rebooked' },
     { slug: 'annual-service-reminder',        label: 'Losing landlord annual check customers', desc: 'Landlords need annual checks every year — remind them before they book someone else' },
-    { slug: 'new-enquiry-sms',                label: 'Missing enquiries while on site',        desc: '78% of jobs go to whoever responds first — you need an instant alert' },
+    { slug: 'new-enquiry-sms',                label: 'Missing enquiries while on site',        desc: 'They ring the next number if you don\'t answer — and you can\'t answer from a roof' },
     { slug: 'lapsed-customer-winback',        label: 'Past customers going to competitors',    desc: 'Customers from 18+ months ago have forgotten you — a simple message brings them back' },
   ],
   'builder': [
@@ -103,6 +105,15 @@ const DEFAULT_PAIN_POINTS = [
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 
+// What they run the business on. Knowing this tells us where work comes in and
+// where it has to end up — on D&M it was Outlook, Excel and the contractor's
+// portal (Tradex), and that shaped the whole build. Added 12 Oct 2026.
+const SOFTWARE_OPTIONS = [
+  'Pen & paper', 'WhatsApp', 'Outlook / Hotmail', 'Gmail', 'Excel', 'Google Sheets',
+  'Xero', 'QuickBooks', 'Sage', 'FreeAgent', 'Tradify', 'ServiceM8', 'Powered Now',
+  "A client's online portal",
+];
+
 const teamSizes: TeamSize[] = ['Just me', '2–3 people', '4–10 people', '10+ people'];
 
 const inputClass = "w-full bg-white/5 border border-white/10 text-white p-4 rounded-xl focus:ring-2 focus:ring-accent-500/50 focus:border-accent-500/50 outline-none transition-all placeholder:text-slate-700 hover:bg-white/[0.08] text-sm";
@@ -122,6 +133,8 @@ export const Contact: React.FC = () => {
     painPoints: [],
     specialistSlug: '',
     notes: '',
+    software: [],
+    softwareOther: '',
     callConsent: false,
   });
   const [submitted, setSubmitted] = useState(false);
@@ -134,6 +147,10 @@ export const Contact: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
+    const softwareSummary = [
+      ...formData.software,
+      formData.softwareOther.trim(),
+    ].filter(Boolean).join(', ');
     setError(null);
     try {
       const webhookUrl = import.meta.env.VITE_WEBHOOK_URL || 'http://localhost:5000/api/intake';
@@ -149,7 +166,15 @@ export const Contact: React.FC = () => {
           trade: formData.trade || null,
           painPoints: formData.painPoints,
           specialistSlug: formData.specialistSlug || null,
-          notes: formData.notes,
+          // The command centre's intake validator only keeps fields it knows, so
+          // the software answer is also written into notes — that way it reaches
+          // Colin today. `software` is sent too, ready for when the backend reads it.
+          notes: [
+            softwareSummary ? `Software they use: ${softwareSummary}` : '',
+            formData.notes,
+          ].filter(Boolean).join('\n\n'),
+          software: formData.software,
+          softwareOther: formData.softwareOther,
           callConsent: formData.callConsent,
           website, // honeypot
           submittedAt: new Date().toISOString(),
@@ -193,16 +218,16 @@ export const Contact: React.FC = () => {
           <div className="text-center mb-12">
             <FadeIn>
               <div className="inline-block px-3 py-1 mb-5 text-xs font-bold tracking-widest text-accent-400 uppercase bg-accent-500/10 rounded-full border border-accent-500/20">
-                Free Assessment
+                Get started
               </div>
               <h2 className="text-4xl md:text-5xl font-extrabold text-white mb-4 leading-tight tracking-tight">
-                Design Your{' '}
+                Let's get your{' '}
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-accent-400 to-blue-400">
-                  Automation
+                  evenings back
                 </span>
               </h2>
               <p className="text-slate-400 text-lg font-light max-w-xl mx-auto leading-relaxed">
-                Tell us about your trade. We'll build the right automation package for your business — no guesswork.
+                Two minutes. Tell us your trade and what's eating your time — we'll come back to you personally.
               </p>
             </FadeIn>
           </div>
@@ -239,7 +264,7 @@ export const Contact: React.FC = () => {
                   <div className="h-20 w-20 bg-emerald-500/10 text-emerald-400 rounded-full flex items-center justify-center mb-6 border border-emerald-500/20 shadow-[0_0_40px_rgba(16,185,129,0.15)]">
                     <Check className="w-10 h-10" />
                   </div>
-                  <h3 className="text-3xl font-bold text-white mb-3">You're All Set!</h3>
+                  <h3 className="text-3xl font-bold text-white mb-3">Got it — thanks!</h3>
                   <p className="text-slate-400 text-lg max-w-sm leading-relaxed">
                     {formData.callConsent
                       ? "Check your inbox for your cost breakdown. Our AI agent will call you shortly — it's worth picking up."
@@ -315,7 +340,7 @@ export const Contact: React.FC = () => {
                       <div className="space-y-2">
                         <label className={labelClass}>
                           What trade are you in?{' '}
-                          <span className="normal-case font-normal text-slate-700">(helps us pick the right automations)</span>
+                          <span className="normal-case font-normal text-slate-700">(so we know what you deal with)</span>
                         </label>
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                           {TRADES.map(trade => (
@@ -357,7 +382,7 @@ export const Contact: React.FC = () => {
                         <div className="h-9 w-9 bg-accent-500 rounded-lg flex items-center justify-center font-black text-sm shadow-lg shadow-accent-500/20 flex-shrink-0">2</div>
                         <div>
                           <h3 className="text-xl font-bold text-white">
-                            What you'll get
+                            How you work
                             {selectedTrade && (
                               <span className="ml-2 text-sm font-normal text-slate-500">
                                 {selectedTrade.emoji} {selectedTrade.name}
@@ -365,7 +390,7 @@ export const Contact: React.FC = () => {
                             )}
                           </h3>
                           <p className="text-slate-500 text-sm mt-0.5">
-                            All ten automations, every time. Nothing to choose between.
+                            One plan with everything in it. Now tell us how you work.
                           </p>
                         </div>
                       </div>
@@ -380,17 +405,14 @@ export const Contact: React.FC = () => {
                           Everything below is included
                         </p>
                         <div className="flex flex-wrap gap-2">
-                          {['Lead Follow-Up', 'Quote Reminder', 'Invoice Chaser', 'Appointment Reminder', 'Review Request'].map(label => (
+                          {['Enquiry replies', 'Quote follow-ups', 'Invoices & chasing', 'Booking reminders', 'Review requests', 'AI PA & Call Me'].map(label => (
                             <span key={label} className="text-xs px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 font-medium">
                               ✓ {label}
                             </span>
                           ))}
-                          <span className="text-xs px-2.5 py-1 rounded-full bg-accent-500/10 border border-accent-500/20 text-accent-400 font-medium">
-                            + 5 built for {selectedTrade ? selectedTrade.name.toLowerCase() + 's' : 'your trade'}
-                          </span>
                         </div>
                         <p className="text-[10px] text-slate-500 mt-2.5">
-                          One plan, no tiers. Everyone gets all ten.
+                          £69 a month + £100 setup. Got a job that isn't on the list? Tell us below — we can build it.
                         </p>
                       </div>
 
@@ -424,17 +446,53 @@ export const Contact: React.FC = () => {
                           anyway, so every pick silently scored a flat 1 hour with
                           blank supporting text. */}
 
+                      {/* Software they use */}
+                      <div className="space-y-2">
+                        <label className={labelClass}>
+                          What do you use to run the business?{' '}
+                          <span className="normal-case font-normal text-slate-700">(tick all that apply)</span>
+                        </label>
+                        <div className="flex flex-wrap gap-2">
+                          {SOFTWARE_OPTIONS.map(opt => {
+                            const on = formData.software.includes(opt);
+                            return (
+                              <button key={opt} type="button"
+                                aria-pressed={on}
+                                onClick={() => setFormData(prev => ({
+                                  ...prev,
+                                  software: on ? prev.software.filter(x => x !== opt) : [...prev.software, opt],
+                                }))}
+                                className={`px-3 py-2 rounded-xl border text-xs font-semibold transition-all duration-200 active:scale-95 min-h-[40px] ${
+                                  on
+                                    ? 'bg-accent-500/25 border-accent-400 text-white'
+                                    : 'bg-slate-900/60 border-white/15 text-slate-400 hover:border-white/30 hover:text-slate-200'
+                                }`}
+                              >
+                                {on ? '✓ ' : ''}{opt}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        <input
+                          type="text"
+                          value={formData.softwareOther}
+                          onChange={e => setFormData({ ...formData, softwareOther: e.target.value.slice(0, 200) })}
+                          className={inputClass}
+                          placeholder="Anything else? e.g. the name of your accounts package or a contractor's portal like Tradex"
+                        />
+                      </div>
+
                       {/* Notes */}
                       <div className="space-y-1.5">
                         <label className={labelClass}>
-                          Anything else?{' '}
+                          What job do you wish happened by itself?{' '}
                           <span className="normal-case font-normal text-slate-700">(optional)</span>
                         </label>
                         <textarea
                           value={formData.notes}
                           onChange={e => setFormData({ ...formData, notes: e.target.value })}
                           className={`${inputClass} resize-none h-24`}
-                          placeholder="Any specific problems or things you'd like help with..."
+                          placeholder="The job you hate doing — e.g. 'Every job comes in by email and I type it into a spreadsheet, then make an invoice.'"
                         />
                       </div>
 
@@ -502,7 +560,7 @@ export const Contact: React.FC = () => {
                               Sending...
                             </>
                           ) : (
-                            error ? 'Try Again' : "Show Me What It's Costing Me"
+                            error ? 'Try Again' : 'Send it over'
                           )}
                         </Button>
                       </div>

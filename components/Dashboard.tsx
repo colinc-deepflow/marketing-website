@@ -3,25 +3,25 @@ import { Container, Section, FadeIn, SectionHeading } from './ui/Shared';
 import { Lock, Bell, Search, Menu, FileText, CheckCircle, Clock, AlertCircle, TrendingUp } from 'lucide-react';
 
 const dashboardItems = [
-  { label: 'Active Enquiries', value: '14', color: 'text-blue-600', bg: 'bg-blue-50' },
-  { label: 'Pending Quotes', value: '£8.4k', color: 'text-purple-600', bg: 'bg-purple-50' },
-  { label: 'Live Jobs', value: '6', color: 'text-emerald-600', bg: 'bg-emerald-50' },
-  { label: 'Overdue Payments', value: '2', color: 'text-rose-600', bg: 'bg-rose-50' },
+  { label: 'New enquiries', value: '4', color: 'text-blue-600', bg: 'bg-blue-50' },
+  { label: 'Quotes out', value: '£8.4k', color: 'text-purple-600', bg: 'bg-purple-50' },
+  { label: 'Jobs on', value: '6', color: 'text-emerald-600', bg: 'bg-emerald-50' },
+  { label: 'Owed to you', value: '£2.3k', color: 'text-rose-600', bg: 'bg-rose-50' },
 ];
 
 const pipelineRows = [
-  { name: 'Thompson Kitchen Fit', status: 'Quote Sent', time: '12m ago', color: 'bg-purple-100 text-purple-700' },
-  { name: 'Oaks Hotel Wardrobes', status: 'Job Booked', time: '3h ago', color: 'bg-emerald-100 text-emerald-700' },
-  { name: 'Bespoke Stairs Request', status: 'AI Handled', time: 'Just now', color: 'bg-blue-100 text-blue-700' },
-  { name: 'City Dental Clinic', status: 'Invoiced', time: '1d ago', color: 'bg-slate-100 text-slate-700' },
-  { name: 'Greenway Custom Desk', status: 'Overdue', time: '4d ago', color: 'bg-rose-100 text-rose-700' },
+  { name: 'Thompson kitchen fit', status: 'Quoted', time: '12m ago', color: 'bg-purple-100 text-purple-700' },
+  { name: 'Oaks Hotel wardrobes', status: 'Accepted', time: '3h ago', color: 'bg-emerald-100 text-emerald-700' },
+  { name: 'Stairs enquiry — Lisburn', status: 'Reply ready', time: 'Just now', color: 'bg-blue-100 text-blue-700' },
+  { name: 'Dental surgery shelving', status: 'Invoiced', time: '1d ago', color: 'bg-slate-100 text-slate-700' },
+  { name: 'Greenway desk', status: 'Being chased', time: '9d ago', color: 'bg-rose-100 text-rose-700' },
 ];
 
 const controlItems = [
-  { text: 'See all enquiries at a glance', icon: Bell },
-  { text: 'Track every quote you\'ve sent', icon: FileText },
-  { text: 'Monitor your booked jobs', icon: CheckCircle },
-  { text: 'See which invoices are paid or overdue', icon: AlertCircle },
+  { text: 'Every enquiry, quote, job and invoice on one screen', icon: FileText },
+  { text: 'Messages waiting for your OK, right at the top', icon: Bell },
+  { text: 'One green button moves a job on — that\'s the whole job', icon: CheckCircle },
+  { text: 'See who\'s slow to pay before you quote them again', icon: AlertCircle },
 ];
 
 export const Dashboard: React.FC = () => {
@@ -33,8 +33,8 @@ export const Dashboard: React.FC = () => {
           {/* Left: copy */}
           <div>
             <SectionHeading
-              title={<>Nothing Runs <span className="text-accent-400">Blindly</span></>}
-              subtitle="Automation shouldn't mean losing sight of your business. We build a central command centre so you always know what's happening."
+              title={<>Your whole business, <span className="text-accent-400">in your pocket</span></>}
+              subtitle="No spreadsheets, no scribbled notes, no wondering where a job's at. Check it in the van between jobs — most days it's a few taps."
               dark
             />
 
@@ -63,7 +63,7 @@ export const Dashboard: React.FC = () => {
                   <div className="w-2.5 h-2.5 rounded-full bg-slate-700" />
                 </div>
                 <div className="text-slate-400 text-[10px] font-bold tracking-widest uppercase">
-                  Deepflow Control Center
+                  DeepFlow — your jobs
                 </div>
                 <div className="flex gap-2 text-slate-500">
                   <TrendingUp size={11} />
@@ -114,10 +114,10 @@ export const Dashboard: React.FC = () => {
               <div className="bg-slate-50 px-5 py-2.5 border-t border-slate-100 flex justify-between items-center text-[9px] text-slate-500 font-bold uppercase tracking-widest">
                 <div className="flex items-center gap-1.5">
                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Secure Cloud Sync
+                  2 messages waiting for you
                 </div>
                 <div className="flex items-center gap-1">
-                  <Lock className="w-2.5 h-2.5" /> Data Sovereign
+                  <Lock className="w-2.5 h-2.5" /> You approve everything
                 </div>
               </div>
             </div>

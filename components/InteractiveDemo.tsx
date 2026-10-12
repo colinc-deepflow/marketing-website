@@ -35,33 +35,40 @@ interface Scenario {
   output: OutputPreview;
 }
 
+// ============================================================================
+// Scenarios rewritten 11 Oct 2026 to match what the platform really does
+// (see the project doc claude/feature-audit-2026-10.md). The old ones showed
+// things that don't exist: Stripe payment links, calendar availability scans,
+// WhatsApp, and messages "sent automatically". Every message here is written
+// for the tradesperson and waits for his approval.
+// ============================================================================
 const scenarios: Scenario[] = [
   {
-    id: 'quote',
-    label: 'New Quote Request',
-    icon: FileText,
+    id: 'enquiry',
+    label: 'New Enquiry',
+    icon: Mail,
     triggerIcon: Zap,
-    trigger: 'Enquiry received via website form',
-    triggerDetail: 'Webhook fired · Customer data extracted · Job type identified',
+    trigger: 'Someone fills in your enquiry page',
+    triggerDetail: 'Kitchen fit · Name, phone and email captured · 8:42pm',
     steps: [
       {
         icon: Database,
-        label: 'Log & Acknowledge',
-        detail: 'Contact saved to CRM, auto-reply sent to customer within 60 seconds',
+        label: 'Saved to your enquiries',
+        detail: 'It appears in your app straight away, marked New',
         iconColor: 'text-blue-400',
         iconBg: 'bg-blue-500/10',
       },
       {
-        icon: FileText,
-        label: 'Qualify the Job',
-        detail: 'AI drafts follow-up questions tailored to the job type',
+        icon: Sparkles,
+        label: 'Reply written for you',
+        detail: 'In your words, asking the questions you\'d ask — ready within seconds',
         iconColor: 'text-amber-400',
         iconBg: 'bg-amber-500/10',
       },
       {
-        icon: Clock,
-        label: 'Schedule Follow-Up',
-        detail: '24hr chaser queued automatically if no customer response detected',
+        icon: Bell,
+        label: 'Waiting for your OK',
+        detail: 'Tap approve and it\'s gone — while the other lads are still asleep on it',
         iconColor: 'text-violet-400',
         iconBg: 'bg-violet-500/10',
       },
@@ -69,49 +76,50 @@ const scenarios: Scenario[] = [
     output: {
       type: 'email',
       channel: 'Email',
-      to: '[Customer Name]',
-      subject: "Re: Your Enquiry — We'll Be in Touch",
-      fullBody: `Hi [Customer Name],
+      to: 'Claire Thompson',
+      subject: 'Re: Kitchen fit',
+      fullBody: `Hi Claire,
 
-Thanks for getting in touch. I've received your enquiry and will put together a detailed quote for you shortly.
+Thanks for getting in touch about the kitchen. I'd be glad to take a look.
 
-To make sure I give you an accurate price, could you quickly confirm:
-  • The scope and location of the job
-  • Your preferred materials or specifications
-  • Your ideal timeline
+So I can give you a proper price, could you let me know:
+  • Roughly how many units, and is it a full replacement?
+  • Have you got the units, or would you like me to supply them?
+  • When are you hoping to have it done?
 
-I'll have your quote ready within 48 hours of receiving those details.
+I can call out to measure up next week if that suits.
 
-Best,
-[Your Name]`,
+Cheers,
+Mark
+Mark Smith Joinery`,
     },
   },
   {
-    id: 'silent',
-    label: 'Silent Client',
+    id: 'quote',
+    label: 'Quote Gone Quiet',
     icon: MessageSquare,
     triggerIcon: Clock,
-    trigger: 'No client response detected for 5+ days',
-    triggerDetail: 'Scheduled scan · 9am daily · Status: Quote Sent, no reply',
+    trigger: 'No reply to your quote',
+    triggerDetail: 'Quote for £4,200 sent Tuesday · No answer yet',
     steps: [
       {
         icon: Search,
-        label: 'Detect Silence',
-        detail: 'System scans all open jobs with status "Quote Sent" and no reply',
+        label: 'It notices the silence',
+        detail: 'Every message it sends is watched for a reply',
         iconColor: 'text-amber-400',
         iconBg: 'bg-amber-500/10',
       },
       {
         icon: Mail,
-        label: 'Send Chaser',
-        detail: 'Friendly, personalised follow-up email sent automatically on Day 5',
+        label: 'Friendly follow-up written',
+        detail: 'A light nudge, not a hard sell — waiting for your OK',
         iconColor: 'text-accent-400',
         iconBg: 'bg-accent-500/10',
       },
       {
-        icon: AlertCircle,
-        label: 'Escalate if Needed',
-        detail: 'Day 14: job flagged for your manual review if still no response',
+        icon: Phone,
+        label: 'Still nothing? You\'re told',
+        detail: 'After a couple of follow-ups, it tells you it\'s time to give them a ring',
         iconColor: 'text-rose-400',
         iconBg: 'bg-rose-500/10',
       },
@@ -119,152 +127,47 @@ Best,
     output: {
       type: 'email',
       channel: 'Email',
-      to: '[Customer Name]',
-      subject: 'Quick Check-In — Your Quote',
-      fullBody: `Hi [Customer Name],
+      to: 'Paul Kelly',
+      subject: 'Your quote — any questions?',
+      fullBody: `Hi Paul,
 
-Just checking in on the quote I sent over on [date]. Wanted to make sure it reached you and that everything looked clear.
+Just checking the quote for the stairs came through okay.
 
-No pressure at all — just let me know either way so I can keep my schedule updated.
+If anything isn't clear, or you'd like me to look at a different option, just say and I'll sort it.
 
-Happy to talk through anything or adjust the quote if needed.
+No rush at all — I just want to keep a slot free for you if you're going ahead.
 
 Cheers,
-[Your Name]`,
-    },
-  },
-  {
-    id: 'reminder',
-    label: 'Job Reminder',
-    icon: Bell,
-    triggerIcon: Calendar,
-    trigger: 'Job scheduled within 7 days detected',
-    triggerDetail: 'Morning calendar scan · Prep sequence triggered',
-    steps: [
-      {
-        icon: Calendar,
-        label: 'Detect Upcoming Job',
-        detail: 'Daily calendar scan flags all jobs due within 7 days',
-        iconColor: 'text-blue-400',
-        iconBg: 'bg-blue-500/10',
-      },
-      {
-        icon: Mail,
-        label: 'Email Reminder (Day −3)',
-        detail: 'Reminder email with prep checklist sent 3 days before the job',
-        iconColor: 'text-amber-400',
-        iconBg: 'bg-amber-500/10',
-      },
-      {
-        icon: MessageSquare,
-        // WhatsApp dropped entirely (#56) — the demo was showing a channel the
-        // product does not have, to people deciding whether to buy it.
-        label: 'Email reminder (Day −1)',
-        detail: '24hr reminder sent by email, awaits confirmation',
-        iconColor: 'text-emerald-400',
-        iconBg: 'bg-emerald-500/10',
-      },
-    ],
-    output: {
-      type: 'message',
-      channel: 'Email',
-      to: '[Customer Name]',
-      fullBody: `Hi [Customer Name] 👋
-
-Just a reminder your job is scheduled for tomorrow at [Time].
-
-Before we arrive, please make sure:
-  ✓ The area is clear and accessible
-  ✓ Parking is available for our van
-  ✓ Any fragile items nearby are moved
-
-I'll give you a quick call 30 minutes before arrival.
-
-See you tomorrow!
-[Your Name]`,
+Mark
+Mark Smith Joinery`,
     },
   },
   {
     id: 'invoice',
-    label: 'Invoice & Payment',
+    label: 'Job Finished',
     icon: DollarSign,
     triggerIcon: CheckCircle2,
-    trigger: 'Job marked as "Complete" in dashboard',
-    triggerDetail: 'Status change trigger · Invoice auto-generated from job record',
+    trigger: 'You tap "Completed" on the job',
+    triggerDetail: 'Bathroom refit · Agreed price £850',
     steps: [
       {
         icon: FileText,
-        label: 'Generate Invoice',
-        detail: 'Pulls agreed quote amount, materials & labour into invoice template',
-        iconColor: 'text-emerald-400',
-        iconBg: 'bg-emerald-500/10',
-      },
-      {
-        icon: Send,
-        label: 'Send with Payment Link',
-        detail: 'Invoice emailed instantly with a Stripe / GoCardless payment link',
-        iconColor: 'text-blue-400',
-        iconBg: 'bg-blue-500/10',
-      },
-      {
-        icon: Clock,
-        label: 'Chase if Unpaid',
-        detail: 'Reminders sent automatically at Day 7, 14 & 21 — stops on payment',
-        iconColor: 'text-amber-400',
-        iconBg: 'bg-amber-500/10',
-      },
-    ],
-    output: {
-      type: 'email',
-      channel: 'Email',
-      to: '[Customer Name]',
-      subject: 'Invoice #INV-042 — Payment Due',
-      fullBody: `Hi [Customer Name],
-
-Great working with you — please find invoice #INV-042 for £[Amount] below.
-
-Pay instantly online:
-  → [Payment Link]
-
-Or by bank transfer:
-  Sort Code: XX-XX-XX
-  Account:   XXXXXXXX
-  Reference: INV-042
-
-Payment is due within 14 days. Any questions, just shout.
-
-Thanks,
-[Your Name]`,
-    },
-  },
-  {
-    id: 'booking',
-    label: 'Booking Confirmation',
-    icon: Calendar,
-    triggerIcon: Phone,
-    trigger: 'Customer requests a site visit',
-    // Was 'Form submission · WhatsApp message · Availability check triggered'.
-    // WhatsApp dropped (#56); enquiries arrive by web form or email.
-    triggerDetail: 'Form submission · Email enquiry · Availability check triggered',
-    steps: [
-      {
-        icon: Calendar,
-        label: 'Check Availability',
-        detail: 'Calendar scanned, 3 available slots identified and sent to customer',
+        label: 'Invoice email written',
+        detail: 'Uses the price on the job, with your bank details on it',
         iconColor: 'text-blue-400',
         iconBg: 'bg-blue-500/10',
       },
       {
         icon: CheckCircle2,
-        label: 'Confirm Booking',
-        detail: 'Customer selects a slot — auto-added to your calendar with notes',
+        label: 'Figures checked',
+        detail: 'The £ amount and bank details are checked against the job before it can go',
         iconColor: 'text-emerald-400',
         iconBg: 'bg-emerald-500/10',
       },
       {
-        icon: Bell,
-        label: 'Send Reminders',
-        detail: '24hr reminder to customer + job briefing sent to you',
+        icon: Clock,
+        label: 'Chasing lined up',
+        detail: 'Polite reminders at 7, 14, 30 and 45 days — they stop when you mark it paid',
         iconColor: 'text-violet-400',
         iconBg: 'bg-violet-500/10',
       },
@@ -272,24 +175,114 @@ Thanks,
     output: {
       type: 'email',
       channel: 'Email',
-      to: '[Customer Name]',
-      subject: 'Visit Confirmed — [Day, Date] at [Time]',
-      fullBody: `Hi [Customer Name],
+      to: 'Sarah Smith',
+      subject: 'Invoice — bathroom refit',
+      fullBody: `Hi Sarah,
 
-Your visit is confirmed:
+Thanks again for having us — I hope you're enjoying the new bathroom.
 
-  📅 Date:    [Day, Date]
-  🕐 Time:    [Time]
-  📍 Address: [Your Address]
+As agreed, the total for the work is £850.00.
 
-I'll assess the job, talk through your requirements, and give you a clear idea of cost. Usually around 30–45 minutes.
+You can pay by bank transfer to:
+  Mark Smith Joinery
+  Sort code: 00-00-00
+  Account: 00000000
 
-Please have ready if possible:
-  ✓ Any reference photos or ideas
-  ✓ Access to all relevant areas
+Any questions, just give me a shout.
 
-See you then!
-[Your Name]`,
+Cheers,
+Mark`,
+    },
+  },
+  {
+    id: 'reply',
+    label: 'Customer Replies',
+    icon: Mail,
+    triggerIcon: Mail,
+    trigger: 'A customer answers one of your emails',
+    triggerDetail: '"Any chance you could come Thursday instead of Wednesday?"',
+    steps: [
+      {
+        icon: Search,
+        label: 'It reads what they want',
+        detail: 'A question, a change of date, a query about the bill, or a yes',
+        iconColor: 'text-amber-400',
+        iconBg: 'bg-amber-500/10',
+      },
+      {
+        icon: Sparkles,
+        label: 'Answer written for you',
+        detail: 'Matched to the right job, so it knows what you\'re talking about',
+        iconColor: 'text-accent-400',
+        iconBg: 'bg-accent-500/10',
+      },
+      {
+        icon: Bell,
+        label: 'Chasing stops',
+        detail: 'They\'ve replied, so nobody gets nudged again',
+        iconColor: 'text-emerald-400',
+        iconBg: 'bg-emerald-500/10',
+      },
+    ],
+    output: {
+      type: 'email',
+      channel: 'Email',
+      to: 'Joe Davies',
+      subject: 'Re: Your booking',
+      fullBody: `Hi Joe,
+
+No problem at all — Thursday works.
+
+I'll be with you around 8.30am as planned, just a day later.
+
+Cheers,
+Mark`,
+    },
+  },
+  {
+    id: 'callme',
+    label: 'Call Me',
+    icon: Phone,
+    triggerIcon: Phone,
+    trigger: 'You tap "Call me" in the van',
+    triggerDetail: 'Your phone rings within a few seconds',
+    steps: [
+      {
+        icon: Phone,
+        label: 'You just talk',
+        detail: '"Sarah Smith\'s bathroom is finished, invoice is £850."',
+        iconColor: 'text-violet-400',
+        iconBg: 'bg-violet-500/10',
+      },
+      {
+        icon: Database,
+        label: 'Job updated',
+        detail: 'Marked as finished — exactly as if you\'d tapped it yourself',
+        iconColor: 'text-blue-400',
+        iconBg: 'bg-blue-500/10',
+      },
+      {
+        icon: FileText,
+        label: 'Invoice written',
+        detail: '"Want me to read it to you?" — approve it right there on the call',
+        iconColor: 'text-emerald-400',
+        iconBg: 'bg-emerald-500/10',
+      },
+    ],
+    output: {
+      type: 'message',
+      channel: 'Call Me',
+      to: 'You, on the phone',
+      fullBody: `You:  Sarah Smith's bathroom is finished,
+      invoice is £850.
+
+PA:   Done — I've marked it finished and the
+      invoice for £850 is written. Want me to
+      read it to you?
+
+You:  Go on, send it.
+
+PA:   Sent. Anything else before I let you go?`,
     },
   },
   {
@@ -297,50 +290,46 @@ See you then!
     label: 'Review Request',
     icon: Star,
     triggerIcon: Star,
-    trigger: 'Job marked complete — 3-day timer starts',
-    triggerDetail: 'Delayed trigger · Personalised message queued',
+    trigger: 'You mark the job "Paid"',
+    triggerDetail: 'Two days later, once they\'ve settled up',
     steps: [
       {
         icon: Clock,
-        label: '3-Day Wait',
-        detail: 'Timer starts on job completion — gives the customer time to settle in',
+        label: 'Waits two days',
+        detail: 'They\'ve paid and had time to enjoy the work',
         iconColor: 'text-blue-400',
         iconBg: 'bg-blue-500/10',
       },
       {
         icon: Star,
-        label: 'Send Review Request',
-        detail: 'Personalised email with a direct Google review link sent automatically',
-        iconColor: 'text-amber-400',
-        iconBg: 'bg-amber-500/10',
+        label: 'Review request written',
+        detail: 'With your Google, Checkatrade or Trustpilot link',
+        iconColor: 'text-yellow-400',
+        iconBg: 'bg-yellow-500/10',
       },
       {
-        icon: AlertCircle,
-        label: 'Monitor & Flag',
-        detail: 'New reviews trigger instant alerts — negatives escalated to you first',
-        iconColor: 'text-rose-400',
-        iconBg: 'bg-rose-500/10',
+        icon: Calendar,
+        label: 'A note for next year',
+        detail: 'Eleven months on, a friendly message to bring them back',
+        iconColor: 'text-emerald-400',
+        iconBg: 'bg-emerald-500/10',
       },
     ],
     output: {
       type: 'email',
       channel: 'Email',
-      to: '[Customer Name]',
-      subject: 'How Did We Do? Quick Favour 🙏',
-      fullBody: `Hi [Customer Name],
+      to: 'Sarah Smith',
+      subject: 'Thanks, Sarah — quick favour?',
+      fullBody: `Hi Sarah,
 
-Hope everything is looking great after we finished your [project] — it was a pleasure working with you.
+Thanks for paying so promptly, and for having us in.
 
-If you're happy with the result, a quick Google review would mean the world to us:
+If you're happy with the bathroom, would you mind leaving a short review? It really helps a small business like mine.
 
-  ⭐ Leave a Review → [Google Review Link]
+[Your Google review link]
 
-Just a sentence or two makes a huge difference to other homeowners finding quality tradespeople.
-
-If anything isn't quite right, please reply to this email first — I'll sort it straight away.
-
-Thanks so much,
-[Your Name]`,
+Thanks again,
+Mark`,
     },
   },
 ];
@@ -397,8 +386,8 @@ export const InteractiveDemo: React.FC = () => {
     <Section id="demo" className="bg-slate-950 overflow-hidden">
       <Container>
         <SectionHeading
-          title={<>See the <span className="text-accent-400">System</span> in Action</>}
-          subtitle="Select a scenario to watch the automation run in real time — exactly how it works in production."
+          title={<>See it <span className="text-accent-400">work</span></>}
+          subtitle="Pick one. Watch what happens, and see the message it writes for you."
           center
           dark
         />
@@ -425,7 +414,7 @@ export const InteractiveDemo: React.FC = () => {
 
         {/* Main panel */}
         {activeScenario && (
-          <div className="grid lg:grid-cols-2 gap-6 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start [&>*]:min-w-0">
 
             {/* Left: Trigger + Steps */}
             <div className="space-y-3">
@@ -534,11 +523,11 @@ export const InteractiveDemo: React.FC = () => {
                         <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/50" />
                       </div>
                       <span className="text-slate-500 text-[10px] font-bold uppercase tracking-widest">
-                        {activeScenario.output.channel} · Draft
+                        {activeScenario.output.type === 'message' ? activeScenario.output.channel : `${activeScenario.output.channel} · Draft`}
                       </span>
                     </div>
                     <span className="text-[10px] font-bold px-2.5 py-1 bg-emerald-500/10 text-emerald-400 rounded-full border border-emerald-500/20">
-                      Ready to Review
+                      {activeScenario.output.type === 'message' ? 'On the call' : 'Ready for your OK'}
                     </span>
                   </div>
 
@@ -582,11 +571,13 @@ export const InteractiveDemo: React.FC = () => {
 
                     <div className="mt-5 pt-4 border-t border-white/5 flex items-center justify-between">
                       <span className="text-[11px] text-slate-600">
-                        Generated automatically · awaiting your review
+                        {activeScenario.output.type === 'message' ? 'Updates your jobs as you talk' : 'Written for you · waiting for your OK'}
                       </span>
-                      <button className="text-[11px] font-bold text-accent-400 hover:text-accent-300 transition-colors">
-                        Approve & Send →
-                      </button>
+                      {activeScenario.output.type !== 'message' && (
+                        <button className="text-[11px] font-bold text-accent-400 hover:text-accent-300 transition-colors">
+                          Approve & Send →
+                        </button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -596,8 +587,8 @@ export const InteractiveDemo: React.FC = () => {
                     <Sparkles size={20} />
                   </div>
                   <div className="text-center space-y-1">
-                    <p className="text-sm font-bold text-slate-600">Draft preparing…</p>
-                    <p className="text-xs text-slate-700">Appears once the workflow completes</p>
+                    <p className="text-sm font-bold text-slate-600">Writing your message…</p>
+                    <p className="text-xs text-slate-700">It'll appear here in a moment</p>
                   </div>
                 </div>
               )}
@@ -613,9 +604,9 @@ export const InteractiveDemo: React.FC = () => {
               <Sparkles size={15} />
             </div>
             <p className="text-slate-500 text-sm leading-relaxed">
-              These workflows show the exact logic your system will run — built once, running continuously.
-              Every message is held for your review before it sends, so you stay in control at every step.
-              Click any scenario to replay the sequence.
+              Names and figures are made up for the example. The steps are what really happens —
+              and every message waits for you to read it and tap OK before it goes anywhere.
+              Click any example to play it again.
             </p>
           </div>
         </FadeIn>

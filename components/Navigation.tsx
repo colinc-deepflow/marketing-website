@@ -18,10 +18,10 @@ export const Navigation: React.FC<NavigationProps> = ({ isSubPage = false, onNav
   }, []);
 
   const navLinks = [
-    { name: 'How it Works', href: '#how-it-works' },
-    { name: 'Features', href: '#features' },
-    { name: "What's In It For You", href: '#pricing' },
-    { name: 'Demo', href: '#demo' },
+    { name: 'How it works', href: '#how-it-works' },
+    { name: 'What you get', href: '#features' },
+    { name: 'See it work', href: '#demo' },
+    { name: 'Real example', href: '#custom' },
   ];
 
   return (
@@ -75,12 +75,12 @@ export const Navigation: React.FC<NavigationProps> = ({ isSubPage = false, onNav
                   className="px-6 py-2.5 text-sm h-auto rounded-full shadow-accent-500/20"
                   onClick={onNavigateHome}
                 >
-                  Free Assessment
+                  Get started
                 </Button>
               ) : (
                 <a href="#assessment">
                   <Button variant="vibrant" className="px-6 py-2.5 text-sm h-auto rounded-full shadow-accent-500/20">
-                    Free Assessment
+                    Get started
                   </Button>
                 </a>
               )}
@@ -141,12 +141,12 @@ export const Navigation: React.FC<NavigationProps> = ({ isSubPage = false, onNav
                 className="text-lg py-4"
                 onClick={() => { onNavigateHome?.(); setIsMobileMenuOpen(false); }}
               >
-                Get Free Assessment
+                Get started
               </Button>
             ) : (
               <a href="#assessment" onClick={() => setIsMobileMenuOpen(false)}>
                 <Button variant="vibrant" fullWidth className="text-lg py-4">
-                  Get Free Assessment
+                  Get started
                 </Button>
               </a>
             )}

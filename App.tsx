@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navigation } from './components/Navigation';
 import { Hero } from './components/Hero';
 import { Problem, Solution } from './components/ProblemSolution';
@@ -7,6 +7,7 @@ import { PricingCalculator } from './components/PricingCalculator';
 import { Dashboard } from './components/Dashboard';
 import { InteractiveDemo } from './components/InteractiveDemo';
 import { Contact } from './components/Contact';
+import { CustomWork } from './components/CustomWork';
 import { PrivacyPolicy } from './components/PrivacyPolicy';
 import { TermsAndConditions } from './components/TermsAndConditions';
 import { ContactPage } from './components/ContactPage';
@@ -28,16 +29,16 @@ const Footer: React.FC<{ onNavigate: (page: Page) => void }> = ({ onNavigate }) 
         <div className="md:col-span-1">
           <Logo className="mb-5" />
           <p className="text-slate-500 text-sm leading-relaxed mt-4">
-            Practical AI agent systems for businesses that want to reduce repetitive work,
-            improve operations, and keep humans in control.
+            The office manager for tradespeople. We write and chase your enquiries, quotes and
+            invoices — you approve every message. Based in Northern Ireland.
           </p>
         </div>
 
         {/* Services */}
         <div>
-          <p className="text-white font-semibold text-sm mb-5">Services</p>
+          <p className="text-white font-semibold text-sm mb-5">What we do</p>
           <ul className="space-y-3">
-            {['AI agents', 'Workflow automation', 'Automation audits', 'Business support systems'].map(label => (
+            {['The £69 plan', 'Your AI PA', 'Custom work', 'Real example: D&M Joinery'].map(label => (
               <li key={label}>
                 <button onClick={() => onNavigate('services')} className={footerLinkClass}>
                   {label}
@@ -61,13 +62,13 @@ const Footer: React.FC<{ onNavigate: (page: Page) => void }> = ({ onNavigate }) 
         <div>
           <p className="text-white font-semibold text-sm mb-5">Start</p>
           <p className="text-slate-500 text-sm leading-relaxed mb-5">
-            Not sure where AI fits into your business? Start with an automation audit.
+            Tell us the job that eats your evenings. We'll show you how to get rid of it.
           </p>
           <a
             href="#assessment"
             className="text-accent-400 hover:text-accent-300 text-sm font-semibold transition-colors duration-200"
           >
-            Request a consultation →
+            Tell us your problem →
           </a>
         </div>
 
@@ -92,6 +93,16 @@ const Footer: React.FC<{ onNavigate: (page: Page) => void }> = ({ onNavigate }) 
 function App() {
   const [currentPage, setCurrentPage] = useState<Page>('home');
 
+  // Links from sub-pages go to "/#assessment" (a full page load). The sections
+  // only exist once React has rendered, so the browser can't jump there by
+  // itself — scroll once after the first render.
+  useEffect(() => {
+    const id = window.location.hash.slice(1);
+    if (!id) return;
+    const t = setTimeout(() => document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' }), 150);
+    return () => clearTimeout(t);
+  }, []);
+
   const navigateTo = (page: Page) => {
     setCurrentPage(page);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -106,9 +117,10 @@ function App() {
           <Problem />
           <Solution />
           <Features />
-          <PricingCalculator onSeePricing={() => navigateTo('pricing')} />
-          <Dashboard />
           <InteractiveDemo />
+          <Dashboard />
+          <CustomWork />
+          <PricingCalculator onSeePricing={() => navigateTo('pricing')} />
           <Contact />
         </main>
       ) : currentPage === 'privacy' ? (
